@@ -51,6 +51,25 @@ export default function AdminOverviewScreen() {
             onChangeText={setWeight}
           />
         </View>
+
+        <View className="flex-row gap-3">
+          <TextInput
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900"
+            placeholder="Height (cm)"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="numeric"
+            value={height}
+            onChangeText={setHeight}
+          />
+          <TextInput
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900"
+            placeholder="Weight (kg)"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="numeric"
+            value={weight}
+            onChangeText={setWeight}
+          />
+        </View>
       </View>
 
       <TouchableOpacity className="mt-8 rounded-xl bg-violet-700 px-4 py-3 active:bg-violet-800">
