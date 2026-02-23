@@ -2,6 +2,7 @@ import { Href, Link, Stack } from 'expo-router';
 import { View, Text, Pressable } from 'react-native';
 
 const tenants: { name: string; href: Href }[] = [
+  { name: 'LogIn', href: '/LogIn' as const },
   { name: 'Rider', href: '/Rider' as const },
   { name: 'Driver', href: '/Driver' as const },
   { name: 'Admin', href: '/Admin' as const },
