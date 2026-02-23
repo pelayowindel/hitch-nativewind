@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Animated,
-  Modal,
-} from "react-native";
-import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
+import { View, Text, TouchableWithoutFeedback, Modal } from "react-native";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 interface Props {
   visible: boolean;
@@ -14,6 +9,8 @@ interface Props {
 }
 
 export default function RegisterOverlay({ visible, onClose }: Props) {
+  const router = useRouter();
+
   return (
     <Modal
       transparent
@@ -47,7 +44,11 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
             <SlipButton
               text="COMMUTER"
               color="#19D226"
-              icon={<FontAwesome6 name="user" size={18} color="black" />}
+              icon={<FontAwesome name="user" size={18} color="black" />}
+              onPress={() => {
+                onClose();
+                router.push("/user_registration");
+              }}
             />
 
             <Text className="my-6 font-medium text-black">OR</Text>
@@ -55,9 +56,8 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
             <SlipButton
               text="REGISTER AS DRIVER"
               color="#FF8C00"
-              icon={<FontAwesome6 name="motorcycle" size={18} color="black" />}
-            />
-
+              icon={<FontAwesome name="motorcycle" size={18} color="black" />}
+            /> 
           </View>
         </View>
       </View>
@@ -69,10 +69,12 @@ function SlipButton({
   text,
   icon,
   color,
+  onPress,
 }: {
   text: string;
   icon?: React.ReactNode;
   color: string;
+  onPress?: () => void;
 }) {
   const [pressed, setPressed] = useState(false);
 
@@ -80,6 +82,7 @@ function SlipButton({
     <TouchableWithoutFeedback
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
+      onPress={onPress}
     >
       <View className="items-center mb-4">
 
