@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -38,6 +39,60 @@ function SlipCard({
   );
 }
 
+/* =============================
+   SLIP BUTTON
+============================= */
+function SlipButton({
+  text,
+  icon,
+  color,
+  onPress,
+}: {
+  text: string;
+  icon?: React.ReactNode;
+  color: string;
+  onPress?: () => void;
+}) {
+  const [pressed, setPressed] = useState(false);
+
+  return (
+    <TouchableWithoutFeedback
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      onPress={onPress}
+    >
+      <View className="items-center mb-4">
+        <View className="relative w-full">
+          {/* Slip Shadow */}
+          {!pressed && (
+            <View
+              className="absolute bg-black rounded-md"
+              style={{
+                width: "100%",
+                height: "100%",
+                top: 4,
+                left: 4,
+                opacity: 10,
+              }}
+            />
+          )}
+          {/* Button Body */}
+          <View
+            className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
+            style={{
+              backgroundColor: color,
+              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
+            }}
+          >
+            {icon && <View className="mr-2">{icon}</View>}
+            <Text className="font-bold text-black text-lg">{text}</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
+
 const RegistrationScreen: React.FC = () => {
   const router = useRouter();
 
@@ -57,7 +112,7 @@ const RegistrationScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-200 px-6">
+    <SafeAreaView className="flex-1 bg-gray-200 px-6 pt-12">
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -79,9 +134,7 @@ const RegistrationScreen: React.FC = () => {
       <View className="border-b border-black mb-6" />
 
       {/* Subtitle */}
-      <Text className="text-center font-semibold mb-8">
-        COMPLETE TO LOG IN
-      </Text>
+      <Text className="text-center font-semibold mb-8">COMPLETE TO LOG IN</Text>
 
       {/* Email */}
       <Text className="mb-2 text-xs font-semibold">EMAIL ADDRESS</Text>
@@ -116,17 +169,12 @@ const RegistrationScreen: React.FC = () => {
         />
       </SlipCard>
 
-      {/* Continue Button */}
-      <SlipCard>
-        <TouchableOpacity
-          onPress={handleRegister}
-          className="bg-[#00FF38] py-4 items-center"
-        >
-          <Text className="font-bold text-black tracking-wide">
-            CONTINUE TO LOG IN
-          </Text>
-        </TouchableOpacity>
-      </SlipCard>
+      {/* Continue Button as SlipButton */}
+      <SlipButton
+        text="CONTINUE TO LOG IN"
+        color="#00FF38"
+        onPress={handleRegister}
+      />
     </SafeAreaView>
   );
 };

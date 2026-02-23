@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView, TouchableWithoutFeedback } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -28,6 +28,66 @@ function SlipCard({
         {children}
       </View>
     </View>
+  );
+}
+
+/* =============================
+   SLIP BUTTON
+============================= */
+function SlipButton({
+  text,
+  icon,
+  color,
+  onPress,
+}: {
+  text: string;
+  icon?: React.ReactNode;
+  color: string;
+  onPress?: () => void;
+}) {
+  const [pressed, setPressed] = useState(false);
+
+  return (
+    <TouchableWithoutFeedback
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      onPress={onPress}  // ← This triggers the action
+    >
+      <View className="items-center mb-4">
+
+        <View className="relative w-full">
+
+          {/* Slip Shadow */}
+          {!pressed && (
+            <View
+              className="absolute bg-black rounded-md"
+              style={{
+                width: "100%",
+                height: "100%",
+                top: 4,
+                left: 4,
+                opacity: 10,
+              }}
+            />
+          )}
+
+          {/* Button Body */}
+          <View
+            className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
+            style={{
+              backgroundColor: color,
+              transform: pressed
+                ? [{ translateX: 2 }, { translateY: 2 }]
+                : [],
+            }}
+          >
+            {icon && <View className="mr-2">{icon}</View>}
+            <Text className="font-bold text-black text-lg">{text}</Text>
+          </View>
+
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -180,12 +240,11 @@ export default function UserRegistration() {
             </View>
 
             {/* REGISTER BUTTON */}
-            <Pressable
+            <SlipButton
+              text="REGISTER"
+              color="#00FF38"
               onPress={() => router.push("/confirm_registration")}
-              className="bg-[#00FF38] border-2 border-black p-4 mt-4 rounded-sm shadow-md"
-            >
-              <Text className="text-center font-bold text-lg">REGISTER</Text>
-            </Pressable>
+            />
           </View>
         </View>
       </ScrollView>
