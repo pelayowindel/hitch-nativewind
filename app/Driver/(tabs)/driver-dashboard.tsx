@@ -14,6 +14,7 @@ import {
 } from "react-native-safe-area-context";
 import { AntDesign, MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { COLORS, BORDER, SIZES, FONTS } from "../../../constants/Theme";
 
 export default function DriverDashboard() {
   const [online, setOnline] = useState(true);
@@ -22,23 +23,43 @@ export default function DriverDashboard() {
   const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F2F2F2]">
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }}>
       <StatusBar barStyle="dark-content" />
 
       {/* HEADER */}
-      <View className="flex-row items-center justify-between px-6 py-4 border-b-[3px] border-black bg-[#E6E6E6]">
+      <View
+        style={{
+          borderBottomWidth: BORDER.thick,
+          borderColor: COLORS.black,
+          backgroundColor: COLORS.grayLight,
+        }}
+        className="flex-row items-center justify-between px-6 py-4"
+      >
         <View className="flex-row items-center">
-          <View className="w-12 h-12 border-[3px] border-black mr-3 justify-center items-center bg-white rounded-md">
-            <AntDesign name="user" size={22} color="black" />
+          <View
+            style={{
+              borderWidth: BORDER.thick,
+              borderColor: COLORS.black,
+              backgroundColor: COLORS.surface,
+            }}
+            className="w-12 h-12 mr-3 justify-center items-center rounded-md"
+          >
+            <AntDesign name="user" size={22} color={COLORS.black} />
           </View>
           <View>
-            <Text className="text-xs text-gray-500">Driver</Text>
-            <Text className="font-bold text-base">
+            <Text style={{ fontSize: SIZES.xs, color: COLORS.grayText }}>
+              Driver
+            </Text>
+            <Text style={{ fontSize: SIZES.sm }}>
               Juan Dela Cruz
             </Text>
           </View>
         </View>
-        <MaterialIcons name="notifications" size={26} color="#F59E0B" />
+        <MaterialIcons
+          name="notifications"
+          size={26}
+          color={COLORS.primary}
+        />
       </View>
 
       {/* SCROLLABLE AREA */}
@@ -57,12 +78,21 @@ export default function DriverDashboard() {
             <View className="flex-row justify-between items-center">
               <View>
                 <View className="flex-row items-center">
-                  <View className="w-3 h-3 bg-green-500 rounded-full mr-2" />
-                  <Text className="font-semibold text-base">
+                  <View
+                    style={{ backgroundColor: COLORS.green }}
+                    className="w-3 h-3 rounded-full mr-2"
+                  />
+                  <Text style={{ fontSize: SIZES.sm }}>
                     YOU ARE ONLINE
                   </Text>
                 </View>
-                <Text className="text-sm text-gray-400 mt-1">
+                <Text
+                  style={{
+                    fontSize: SIZES.xs,
+                    color: COLORS.grayText,
+                    marginTop: 4,
+                  }}
+                >
                   Visible to Passengers
                 </Text>
               </View>
@@ -70,8 +100,11 @@ export default function DriverDashboard() {
               <Switch
                 value={online}
                 onValueChange={setOnline}
-                thumbColor="white"
-                trackColor={{ true: "#4ADE80", false: "#ccc" }}
+                thumbColor={COLORS.surface}
+                trackColor={{
+                  true: COLORS.green,
+                  false: COLORS.grayMedium,
+                }}
               />
             </View>
           </View>
@@ -79,18 +112,28 @@ export default function DriverDashboard() {
 
         {/* STATS */}
         <View className="flex-row justify-between mb-6">
-
-          {/* Earnings */}
           <View className="w-[48%]">
             <SlipCard>
-              <View className="bg-[#7DB8D6] p-5 rounded-xl">
-                <View className="border border-black bg-white px-3 py-1 mb-20">
-                  <Text className="text-xs">EARNINGS</Text>
+              <View
+                style={{ backgroundColor: COLORS.blue }}
+                className="p-5 rounded-xl"
+              >
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: COLORS.black,
+                    backgroundColor: COLORS.surface,
+                  }}
+                  className="px-3 py-1 mb-20"
+                >
+                  <Text style={{ fontSize: SIZES.xs }}>
+                    EARNINGS
+                  </Text>
                 </View>
-                <Text className="text-2xl font-bold">
+                <Text style={{ fontSize: 22 }}>
                   ₱ 1,250
                 </Text>
-                <Text className="text-xs mt-1">
+                <Text style={{ fontSize: SIZES.xs }}>
                   ₱ 120 today
                 </Text>
               </View>
@@ -98,27 +141,47 @@ export default function DriverDashboard() {
           </View>
 
           <View className="w-[48%] justify-between">
-
             <SlipCard styleClass="mb-4">
-              <View className="bg-[#FF7A1A] p-5 rounded-xl flex-row justify-between items-center">
+              <View
+                style={{ backgroundColor: COLORS.primary }}
+                className="p-5 rounded-xl flex-row justify-between items-center"
+              >
                 <View>
-                  <Text className="text-xs">RIDES</Text>
-                  <Text className="text-2xl font-bold">8</Text>
+                  <Text style={{ fontSize: SIZES.xs }}>
+                    RIDES
+                  </Text>
+                  <Text style={{ fontSize: 22 }}>
+                    8
+                  </Text>
                 </View>
-                <Ionicons name="bicycle" size={22} color="black" />
+                <Ionicons
+                  name="bicycle"
+                  size={22}
+                  color={COLORS.black}
+                />
               </View>
             </SlipCard>
 
             <SlipCard>
-              <View className="bg-[#F3F3F3] p-5 rounded-xl">
-                <Text className="text-xs">RATINGS</Text>
+              <View
+                style={{ backgroundColor: COLORS.grayMedium }}
+                className="p-5 rounded-xl"
+              >
+                <Text style={{ fontSize: SIZES.xs }}>
+                  RATINGS
+                </Text>
                 <View className="flex-row items-center">
-                  <Text className="text-2xl font-bold mr-2">4.9</Text>
-                  <Ionicons name="star" size={18} color="#FBBF24" />
+                  <Text style={{ fontSize: 22, marginRight: 6 }}>
+                    4.9
+                  </Text>
+                  <Ionicons
+                    name="star"
+                    size={18}
+                    color={COLORS.yellow}
+                  />
                 </View>
               </View>
             </SlipCard>
-
           </View>
         </View>
 
@@ -127,136 +190,242 @@ export default function DriverDashboard() {
           <View className="overflow-hidden rounded-xl">
 
             {/* MAP */}
-            <View className="h-28 bg-[#D9D9D9] border-b-[3px] border-black justify-center items-center">
+            <View
+              style={{
+                backgroundColor: COLORS.grayMedium,
+                borderBottomWidth: BORDER.thick,
+                borderColor: COLORS.black,
+              }}
+              className="h-28 justify-center items-center"
+            >
               <Text>MAP AREA</Text>
             </View>
 
             <View className="p-6">
 
-              {/* Passenger */}
               <View className="flex-row justify-between items-center mb-4">
                 <View className="flex-row items-center">
-                  <View className="w-12 h-12 bg-black justify-center items-center mr-3">
-                    <Text className="text-white font-bold">MJ</Text>
+                  <View
+                    style={{ backgroundColor: COLORS.black }}
+                    className="w-12 h-12 justify-center items-center mr-3"
+                  >
+                    <Text style={{ color: COLORS.surface }}>
+                      MJ
+                    </Text>
                   </View>
 
                   <View>
-                    <Text className="font-bold text-base">
+                    <Text style={{ fontSize: SIZES.sm }}>
                       Mary Jane
                     </Text>
 
                     <View className="flex-row items-center mt-1">
-                      <View className="bg-yellow-400 px-2 py-[2px] mr-2">
-                        <Text className="text-[10px] font-bold">4.8</Text>
+                      <View
+                        style={{ backgroundColor: COLORS.yellow }}
+                        className="px-2 py-[2px] mr-2"
+                      >
+                        <Text style={{ fontSize: SIZES.xs }}>
+                          4.8
+                        </Text>
                       </View>
-                      <Text className="text-xs text-gray-500">
+                      <Text
+                        style={{
+                          fontSize: SIZES.xs,
+                          color: COLORS.grayText,
+                        }}
+                      >
                         Cash Payment
                       </Text>
                     </View>
                   </View>
                 </View>
 
-                <Text className="text-lg font-bold">
+                <Text style={{ fontSize: SIZES.md }}>
                   ₱ 145
                 </Text>
               </View>
+{/* PICKUP */}
+<View style={{ flexDirection: "row", marginBottom: 12 }}>
+  <View
+    style={{
+      width: 12,
+      height: 12,
+      backgroundColor: COLORS.blue,
+      borderRadius: 50,
+      marginTop: 4,
+      marginRight: 12,
+    }}
+  />
+  <View>
+    <Text
+      style={{
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.xs,
+        color: COLORS.grayText,
+      }}
+    >
+      PICK UP (2.3 KM)
+    </Text>
 
-              {/* PICKUP */}
-              <View className="flex-row mb-3">
-                <View className="w-3 h-3 bg-blue-600 rounded-full mt-1 mr-3" />
-                <View>
-                  <Text className="text-[10px] text-gray-400">
-                    PICK UP (2.3 KM)
-                  </Text>
-                  <Text className="text-sm font-medium">
-                    SM MALL OF ASIA , NORTH WING
-                  </Text>
-                </View>
-              </View>
+    <Text
+      style={{
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.sm,
+      }}
+    >
+      SM MALL OF ASIA , NORTH WING
+    </Text>
+  </View>
+</View>
 
-              {/* DROP OFF */}
-              <View className="flex-row mb-6">
-                <View className="w-3 h-3 bg-red-500 mt-1 mr-3" />
-                <View>
-                  <Text className="text-[10px] text-gray-400">
-                    DROP OFF
-                  </Text>
-                  <Text className="text-sm font-medium">
-                    AYALA TRIANGLE GARDENS
-                  </Text>
-                </View>
-              </View>
+{/* DROP OFF */}
+<View style={{ flexDirection: "row", marginBottom: 24 }}>
+  <View
+    style={{
+      width: 12,
+      height: 12,
+      backgroundColor: COLORS.red,
+      marginTop: 4,
+      marginRight: 12,
+    }}
+  />
+  <View>
+    <Text
+      style={{
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.xs,
+        color: COLORS.grayText,
+      }}
+    >
+      DROP OFF
+    </Text>
 
+    <Text
+      style={{
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.sm,
+      }}
+    >
+      AYALA TRIANGLE GARDENS
+    </Text>
+  </View>
+</View>
               {!accepted && (
                 <View className="flex-row justify-between">
-                  <TouchableOpacity className="w-[22%] border-[3px] border-black rounded-xl py-3 items-center bg-white">
-                    <Text className="font-bold">X</Text>
+                  <TouchableOpacity
+                    style={{
+                      width: "22%",
+                      borderWidth: BORDER.thick,
+                      borderColor: COLORS.black,
+                      backgroundColor: COLORS.surface,
+                    }}
+                    className="rounded-xl py-3 items-center"
+                  >
+                    <Text>X</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     onPress={() => setAccepted(true)}
-                    className="w-[72%] bg-black rounded-xl py-3 items-center"
+                    style={{
+                      width: "72%",
+                      backgroundColor: COLORS.black,
+                    }}
+                    className="rounded-xl py-3 items-center"
                   >
-                    <Text className="text-white font-bold tracking-wide">
+                    <Text style={{ color: COLORS.surface }}>
                       ACCEPT RIDE →
                     </Text>
                   </TouchableOpacity>
                 </View>
               )}
             </View>
-
           </View>
         </SlipCard>
       </ScrollView>
+      
+{/* BOTTOM NAV */}
+<View
+  style={{
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopWidth: BORDER.thick + 1,
+    borderColor: COLORS.black,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: Math.max(insets.bottom, 12),
+  }}
+>
+  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
 
-      {/* BOTTOM NAV */}
-            <View
-              className="absolute bottom-0 left-0 right-0 border-t-[4px] border-black bg-white px-6 pt-4"
-              style={{ paddingBottom: Math.max(insets.bottom, 12) }}
-            >
-              <View className="flex-row justify-between items-center">
-                <Pressable
-                  onPress={() => router.push("/Driver/driver-dashboard")}
-                  className="items-center"
-                >
-                  <Ionicons name="home" size={24} color="black" />
-                  <Text className="font-bold" style={{ fontSize: 10 }}>
-                    HOME
-                  </Text>
-                </Pressable>
-      
-                <Pressable
-                  onPress={() => router.push("/Driver/history")}
-                  className="items-center"
-                >
-                  <Ionicons name="document-text" size={24} color="#64748b" />
-                  <Text className="font-bold" style={{ fontSize: 10, color: "#64748b" }}>
-                    ACTIVITY
-                  </Text>
-                </Pressable>
-      
-                  <Pressable
-                      onPress={() => router.push("/Driver/chat")}
-                      className="items-center"
-                    >
-                      <Ionicons name="chatbubble-ellipses" size={24} color="black" />
-                      <Text className="font-bold" style={{ fontSize: 10 }}>
-                        MESSAGES
-                      </Text>
-                    </Pressable>
-          
-      
-                <Pressable
-                  onPress={() => router.push("/Driver/driver-profile")}
-                  className="items-center"
-                >
-                  <Ionicons name="person-outline" size={24} color="#64748b" />
-                  <Text className="font-bold" style={{ fontSize: 10, color: "#64748b" }}>
-                    PROFILE
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
+    <Pressable
+      onPress={() => router.push("/Driver/driver-dashboard")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="home" size={24} color={COLORS.black} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.black,
+        }}
+      >
+        HOME
+      </Text>
+    </Pressable>
+
+    <Pressable
+      onPress={() => router.push("/Driver/history")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="document-text" size={24} color={COLORS.grayText} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.grayText,
+        }}
+      >
+        ACTIVITY
+      </Text>
+    </Pressable>
+
+    <Pressable
+      onPress={() => router.push("/Driver/chat")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="chatbubble-ellipses" size={24} color={COLORS.black} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.black,
+        }}
+      >
+        MESSAGES
+      </Text>
+    </Pressable>
+
+    <Pressable
+      onPress={() => router.push("/Driver/driver-profile")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="person-outline" size={24} color={COLORS.grayText} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.grayText,
+        }}
+      >
+        PROFILE
+      </Text>
+    </Pressable>
+
+  </View>
+</View>
     </SafeAreaView>
   );
 }
@@ -275,8 +444,10 @@ function SlipCard({
     <View className={`relative ${styleClass}`}>
       {/* Shadow */}
       <View
-        className="absolute bg-black rounded-2xl"
         style={{
+          position: "absolute",
+          backgroundColor: COLORS.black,
+          borderRadius: 16,
           width: "100%",
           height: "100%",
           top: 4,
@@ -284,8 +455,14 @@ function SlipCard({
         }}
       />
 
-      {/* Card */}
-      <View className="bg-white border-[3px] border-black rounded-2xl">
+      <View
+        style={{
+          backgroundColor: COLORS.surface,
+          borderWidth: BORDER.thick,
+          borderColor: COLORS.black,
+          borderRadius: 16,
+        }}
+      >
         {children}
       </View>
     </View>

@@ -4,7 +4,7 @@ import {
   ScrollView,
   StatusBar,
   Pressable,
-  Text as RNText,
+  Text,
 } from "react-native";
 import {
   SafeAreaView,
@@ -12,36 +12,7 @@ import {
 } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
-/* =============================
-   FONTED TEXT COMPONENT
-============================= */
-function AppText({
-  children,
-  weight = "regular",
-  style,
-  ...props
-}: {
-  children: React.ReactNode;
-  weight?: "regular" | "medium" | "semibold" | "bold";
-  style?: any;
-}) {
-  const fontMap = {
-    regular: "PlusJakartaRegular",
-    medium: "PlusJakartaMedium",
-    semibold: "PlusJakartaSemiBold",
-    bold: "PlusJakartaBold",
-  };
-
-  return (
-    <RNText
-      {...props}
-      style={[{ fontFamily: fontMap[weight] }, style]}
-    >
-      {children}
-    </RNText>
-  );
-}
+import { COLORS, FONTS, SIZES, BORDER } from "../../../constants/Theme";
 
 export default function DriverProfile() {
   const [online, setOnline] = useState(true);
@@ -49,16 +20,27 @@ export default function DriverProfile() {
   const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView className="flex-1 bg-[#CFCFCF]">
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.grayMedium }}>
       <StatusBar barStyle="dark-content" />
 
       {/* HEADER */}
-      <View className="bg-white border-b-[3px] border-black px-4 py-4 flex-row items-center justify-between">
-        <Ionicons name="arrow-back" size={22} />
-        <AppText weight="bold" style={{ fontSize: 16 }}>
+      <View
+        style={{
+          backgroundColor: COLORS.surface,
+          borderBottomWidth: BORDER.thick,
+          borderColor: COLORS.black,
+          paddingHorizontal: 16,
+          paddingVertical: 16,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Ionicons name="arrow-back" size={22} color={COLORS.black} />
+        <Text style={{ fontFamily: FONTS.bold, fontSize: SIZES.lg }}>
           DRIVERS ID: D-402
-        </AppText>
-        <Ionicons name="settings-outline" size={22} />
+        </Text>
+        <Ionicons name="settings-outline" size={22} color={COLORS.black} />
       </View>
 
       <ScrollView
@@ -69,50 +51,97 @@ export default function DriverProfile() {
         showsVerticalScrollIndicator={false}
       >
         {/* PROFILE IMAGE */}
-        <View className="items-center mb-8">
-          <View className="relative">
-            <View className="absolute top-4 left-4 w-40 h-40 bg-[#5B54DD] rounded-2xl" />
-
-            <View className="w-40 h-40 bg-[#EAEAEA] border-[3px] border-black rounded-2xl justify-center items-center">
-              <AppText weight="medium" style={{ color: "#777" }}>
+        <View style={{ alignItems: "center", marginBottom: 32 }}>
+          <View style={{ position: "relative" }}>
+            <View
+              style={{
+                position: "absolute",
+                top: 16,
+                left: 16,
+                width: 160,
+                height: 160,
+                backgroundColor: COLORS.secondary,
+                borderRadius: BORDER.radius,
+              }}
+            />
+            <View
+              style={{
+                width: 160,
+                height: 160,
+                backgroundColor: COLORS.grayLight,
+                borderWidth: BORDER.thick,
+                borderColor: COLORS.black,
+                borderRadius: BORDER.radius,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontFamily: FONTS.medium, color: COLORS.grayText }}>
                 IMAGE
-              </AppText>
+              </Text>
             </View>
-
-            <View className="absolute -bottom-3 -right-3 bg-white border-[3px] border-black px-4 py-1 -rotate-6 rounded-xl">
-              <AppText weight="bold">4.9</AppText>
+            <View
+              style={{
+                position: "absolute",
+                bottom: -12,
+                right: -12,
+                backgroundColor: COLORS.surface,
+                borderWidth: BORDER.thick,
+                borderColor: COLORS.black,
+                paddingHorizontal: 16,
+                paddingVertical: 4,
+                borderRadius: 12,
+                transform: [{ rotate: "-6deg" }],
+              }}
+            >
+              <Text style={{ fontFamily: FONTS.bold, fontSize: SIZES.lg }}>
+                4.9
+              </Text>
             </View>
           </View>
         </View>
 
         {/* STATUS */}
         <SlipCard styleClass="mb-6">
-          <View className="p-4 flex-row justify-between items-center">
+          <View style={{ padding: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <View>
-              <View className="flex-row items-center mb-1">
-                <View className="w-3 h-3 bg-green-500 mr-2 rounded-full" />
-                <AppText weight="bold">
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}>
+                <View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    marginRight: 8,
+                    backgroundColor: online ? COLORS.green : COLORS.grayText,
+                  }}
+                />
+                <Text style={{ fontFamily: FONTS.bold }}>
                   STATUS : {online ? "ONLINE" : "OFFLINE"}
-                </AppText>
+                </Text>
               </View>
-              <AppText
-                weight="medium"
-                style={{ fontSize: 12, color: "#666" }}
-              >
+              <Text style={{ fontFamily: FONTS.medium, fontSize: SIZES.sm, color: COLORS.grayText }}>
                 VISIBLE TO NEARBY RIDERS
-              </AppText>
+              </Text>
             </View>
-
             <Pressable
               onPress={() => setOnline(!online)}
-              className={`w-14 h-7 rounded-full px-1 justify-center ${
-                online ? "bg-green-400" : "bg-gray-400"
-              }`}
+              style={{
+                width: 56,
+                height: 28,
+                borderRadius: 20,
+                paddingHorizontal: 4,
+                justifyContent: "center",
+                backgroundColor: online ? COLORS.green : COLORS.grayMedium,
+              }}
             >
               <View
-                className={`w-5 h-5 bg-white rounded-full ${
-                  online ? "self-end" : "self-start"
-                }`}
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 20,
+                  backgroundColor: COLORS.surface,
+                  alignSelf: online ? "flex-end" : "flex-start",
+                }}
               />
             </Pressable>
           </View>
@@ -120,159 +149,256 @@ export default function DriverProfile() {
 
         {/* TODAY EARNINGS */}
         <SlipCard styleClass="mb-6">
-          <View className="bg-[#3B62E3] p-5 rounded-xl">
-            <AppText
-              weight="medium"
-              style={{ fontSize: 12, color: "white", marginBottom: 6 }}
-            >
+          <View style={{ backgroundColor: COLORS.blue, padding: 20, borderRadius: 12 }}>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: SIZES.sm, color: COLORS.surface, marginBottom: 6 }}>
               TODAY EARNINGS
-            </AppText>
-            <AppText
-              weight="bold"
-              style={{ fontSize: 24, color: "white" }}
-            >
+            </Text>
+            <Text style={{ fontFamily: FONTS.bold, fontSize: SIZES.xxl, color: COLORS.surface }}>
               ₱ 1,250
-            </AppText>
+            </Text>
           </View>
         </SlipCard>
 
         {/* RIDES + HOURS */}
-        <View className="flex-row justify-between mb-6">
-          <View className="w-[48%]">
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 24 }}>
+          <View style={{ width: "48%" }}>
             <SlipCard>
-              <View className="p-4">
-                <AppText weight="medium" style={{ fontSize: 12 }}>
+              <View style={{ padding: 16 }}>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: SIZES.sm }}>
                   TOTAL RIDES
-                </AppText>
-                <AppText weight="bold" style={{ fontSize: 24 }}>
+                </Text>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: SIZES.xxl }}>
                   8
-                </AppText>
+                </Text>
               </View>
             </SlipCard>
           </View>
 
-          <View className="w-[48%]">
+          <View style={{ width: "48%" }}>
             <SlipCard>
-              <View className="p-4">
-                <AppText weight="medium" style={{ fontSize: 12 }}>
+              <View style={{ padding: 16 }}>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: SIZES.sm }}>
                   HOURS ONLINE
-                </AppText>
-                <AppText weight="bold" style={{ fontSize: 24 }}>
+                </Text>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: SIZES.xxl }}>
                   4.5 H
-                </AppText>
+                </Text>
               </View>
             </SlipCard>
           </View>
         </View>
 
-        {/* VEHICLE DETAILS */}
-        <SlipCard styleClass="mb-8">
-          <View className="p-5">
-            <View className="flex-row justify-between items-center mb-4">
-              <AppText weight="bold" style={{ fontSize: 14 }}>
-                VEHICLE DETAILS
-              </AppText>
+{/* VEHICLE DETAILS */}
+<SlipCard styleClass="mb-8">
+  <View className="p-5">
+    <View className="flex-row justify-between items-center mb-4">
+      <Text
+        style={{
+          fontFamily: FONTS.bold,
+          fontSize: SIZES.md,
+        }}
+      >
+        VEHICLE DETAILS
+      </Text>
 
-              <View className="bg-[#8B92FF] border-[3px] border-black px-3 py-1 rounded-xl">
-                <AppText weight="bold" style={{ fontSize: 12 }}>
-                  EDIT
-                </AppText>
-              </View>
-            </View>
+      <View
+        style={{
+          backgroundColor: COLORS.secondary,
+          borderWidth: BORDER.thick,
+          borderColor: COLORS.black,
+          paddingHorizontal: 12,
+          paddingVertical: 4,
+          borderRadius: 12,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: FONTS.bold,
+            fontSize: SIZES.sm,
+          }}
+        >
+          EDIT
+        </Text>
+      </View>
+    </View>
 
-            <AppText weight="bold" style={{ fontSize: 18, marginBottom: 16 }}>
-              YAMAHA NMAX
-            </AppText>
+    <Text
+      style={{
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.xl,
+        marginBottom: 16,
+      }}
+    >
+      YAMAHA NMAX
+    </Text>
 
-            <View className="h-32 bg-[#D9D9D9] border-[3px] border-black rounded-xl mb-4" />
+    <View
+      style={{
+        height: 128,
+        backgroundColor: COLORS.grayMedium,
+        borderWidth: BORDER.thick,
+        borderColor: COLORS.black,
+        borderRadius: BORDER.radius,
+        marginBottom: 16,
+      }}
+    />
 
-            <View className="bg-[#F66A24] border-[3px] border-black px-4 py-2 rounded-xl self-start mb-4">
-              <AppText weight="bold" style={{ fontSize: 12 }}>
-                PHILIPPINES
-              </AppText>
-              <AppText weight="bold" style={{ fontSize: 18 }}>
-                ABC-123
-              </AppText>
-            </View>
+    <View
+      style={{
+        backgroundColor: COLORS.primary,
+        borderWidth: BORDER.thick,
+        borderColor: COLORS.black,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 12,
+        alignSelf: "flex-start",
+        marginBottom: 16,
+      }}
+    >
+      <Text
+        style={{
+          fontFamily: FONTS.bold,
+          fontSize: SIZES.sm,
+        }}
+      >
+        PHILIPPINES
+      </Text>
 
-            <AppText weight="medium" style={{ fontSize: 12 }}>
-              MATTE BLACK
-            </AppText>
-            <AppText weight="medium" style={{ fontSize: 12 }}>
-              2023 MODEL
-            </AppText>
-          </View>
-        </SlipCard>
+      <Text
+        style={{
+          fontFamily: FONTS.bold,
+          fontSize: SIZES.lg,
+        }}
+      >
+        ABC-123
+      </Text>
+    </View>
+
+    <Text
+      style={{
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.sm,
+      }}
+    >
+      MATTE BLACK
+    </Text>
+
+    <Text
+      style={{
+        fontFamily: FONTS.medium,
+        fontSize: SIZES.sm,
+      }}
+    >
+      2023 MODEL
+    </Text>
+  </View>
+</SlipCard>
 
         {/* PAYOUT SETTINGS */}
         <SlipCard styleClass="mb-4">
-          <View className="p-5 flex-row justify-between items-center">
-            <AppText weight="bold">
+          <View style={{ padding: 20, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={{ fontFamily: FONTS.bold }}>
               PAYOUT SETTINGS
-            </AppText>
-            <Ionicons name="arrow-forward" size={18} />
+            </Text>
+            <Ionicons name="arrow-forward" size={18} color={COLORS.black} />
           </View>
         </SlipCard>
 
         {/* DRIVER SUPPORT */}
         <SlipCard>
-          <View className="p-5 flex-row justify-between items-center">
-            <AppText weight="bold">
+          <View style={{ padding: 20, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={{ fontFamily: FONTS.bold }}>
               DRIVER SUPPORT
-            </AppText>
-            <Ionicons name="arrow-forward" size={18} />
+            </Text>
+            <Ionicons name="arrow-forward" size={18} color={COLORS.black} />
           </View>
         </SlipCard>
       </ScrollView>
 
-      {/* BOTTOM NAV */}
-      <View
-        className="absolute bottom-0 left-0 right-0 border-t-[4px] border-black bg-white px-6 pt-4"
-        style={{ paddingBottom: Math.max(insets.bottom, 12) }}
+     
+{/* BOTTOM NAV */}
+<View
+  style={{
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopWidth: BORDER.thick + 1,
+    borderColor: COLORS.black,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: Math.max(insets.bottom, 12),
+  }}
+>
+  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+
+    <Pressable
+      onPress={() => router.push("/Driver/driver-dashboard")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="home" size={24} color={COLORS.black} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.black,
+        }}
       >
-        <View className="flex-row justify-between items-center">
-          <Pressable
-            onPress={() => router.push("/Driver/driver-dashboard")}
-            className="items-center"
-          >
-            <Ionicons name="home" size={24} color="black" />
-            <AppText weight="bold" style={{ fontSize: 10 }}>
-              HOME
-            </AppText>
-          </Pressable>
+        HOME
+      </Text>
+    </Pressable>
 
-          <Pressable
-            onPress={() => router.push("/Driver/history")}
-            className="items-center"
-          >
-            <Ionicons name="document-text" size={24} color="#64748b" />
-            <AppText weight="bold" style={{ fontSize: 10, color: "#64748b" }}>
-              ACTIVITY
-            </AppText>
-          </Pressable>
+    <Pressable
+      onPress={() => router.push("/Driver/history")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="document-text" size={24} color={COLORS.grayText} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.grayText,
+        }}
+      >
+        ACTIVITY
+      </Text>
+    </Pressable>
 
-            <Pressable
-                onPress={() => router.push("/Driver/chat")}
-                className="items-center"
-              >
-                <Ionicons name="chatbubble-ellipses" size={24} color="black" />
-                <AppText weight="bold" style={{ fontSize: 10 }}>
-                  MESSAGES
-                </AppText>
-              </Pressable>
-    
+    <Pressable
+      onPress={() => router.push("/Driver/chat")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="chatbubble-ellipses" size={24} color={COLORS.black} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.black,
+        }}
+      >
+        MESSAGES
+      </Text>
+    </Pressable>
 
-          <Pressable
-            onPress={() => router.push("/Driver/driver-profile")}
-            className="items-center"
-          >
-            <Ionicons name="person-outline" size={24} color="#64748b" />
-            <AppText weight="bold" style={{ fontSize: 10, color: "#64748b" }}>
-              PROFILE
-            </AppText>
-          </Pressable>
-        </View>
-      </View>
+    <Pressable
+      onPress={() => router.push("/Driver/driver-profile")}
+      style={{ alignItems: "center" }}
+    >
+      <Ionicons name="person-outline" size={24} color={COLORS.grayText} />
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: SIZES.xs,
+          color: COLORS.grayText,
+        }}
+      >
+        PROFILE
+      </Text>
+    </Pressable>
+
+  </View>
+</View>
     </SafeAreaView>
   );
 }
@@ -280,25 +406,28 @@ export default function DriverProfile() {
 /* =============================
    SLIP CARD
 ============================= */
-function SlipCard({
-  children,
-  styleClass = "",
-}: {
-  children: React.ReactNode;
-  styleClass?: string;
-}) {
+function SlipCard({ children, styleClass = "" }: any) {
   return (
     <View className={`relative ${styleClass}`}>
       <View
-        className="absolute bg-black rounded-2xl"
         style={{
+          position: "absolute",
+          backgroundColor: COLORS.black,
+          borderRadius: BORDER.radius,
           width: "100%",
           height: "100%",
           top: 4,
           left: 4,
         }}
       />
-      <View className="bg-white border-[3px] border-black rounded-2xl">
+      <View
+        style={{
+          backgroundColor: COLORS.surface,
+          borderWidth: BORDER.thick,
+          borderColor: COLORS.black,
+          borderRadius: BORDER.radius,
+        }}
+      >
         {children}
       </View>
     </View>
