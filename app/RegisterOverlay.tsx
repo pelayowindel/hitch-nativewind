@@ -59,7 +59,7 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               icon={<FontAwesome6 name="motorcycle" size={18} color="black" />}
               onPress={() => {
                 onClose();
-                router.push("./Driver/driverregistration");
+                router.push("./Driver/registration");
               }}
             />
 

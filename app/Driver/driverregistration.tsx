@@ -28,14 +28,16 @@ export default function driverregistration() {
                 <View className="flex-row items-center mb-6">
                     <View className="absolute top-1 left-1 h-full bg-black rounded-lg"
                         style={{ width: 35 }} />
-                    <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg">
+                    <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg"
+                    style={{ borderWidth: 2 }}
+                    onPress={() => router.back()}>
                         <Text className="text-2xl text-center text-black font-bold">←</Text>
                     </Pressable>
                     <Text
                         className="flex-1 text-center text-black text-xl"
                         style={{ fontFamily: "PlusJakarta-Bold" }}
                     >
-                        REGISTRATION
+                       PERSONAL INFORMATION
                     </Text>
                 </View>
 
@@ -63,22 +65,19 @@ export default function driverregistration() {
                     {/* First Name */}
                     <View className="flex-1 relative">
                         {/* Shadow */}
-                        <View className="absolute bg-black rounded-lg"
-                            style={{ top: 23, left: 4, width: "100%", height: "73%" }} />
                         <Text className="mb-1 font-semibold">FIRST NAME</Text>
                         <TextInput
                             className="bg-white border border-black rounded px-4 py-4"
+                             style={{ borderWidth: 2 }}
                             placeholder="Juan"
                         />
                     </View>
                     {/* Last Name */}
                     <View className="flex-1 relative">
-                        {/* Shadow */}
-                        <View className="absolute bg-black rounded-lg"
-                            style={{ top: 23, left: 4, width: "100%", height: "73%" }} />
                         <Text className="mb-1 font-semibold">LAST NAME</Text>
                         <TextInput
                             className="bg-white border border-black rounded px-4 py-4"
+                            style={{ borderWidth: 2 }}
                             placeholder="Dela Cruz"
                         />
                     </View>
@@ -87,22 +86,20 @@ export default function driverregistration() {
 
                 {/* Address */}
                 <View className="mb-3 mt-3">
-                    <View className="absolute bg-black rounded-lg"
-                        style={{ top: 20, left: 4, width: "100%", height: "75%" }} />
                     <Text className="mb-1 font-semibold">ADDRESS</Text>
                     <TextInput
                         className="bg-white border border-black rounded px-4 py-4"
+                        style={{ borderWidth: 2 }}
                         placeholder="Random Place – Bogo City, Cebu"
                     />
                 </View>
 
                 {/* Date of Birth */}
                 <View className="mb-1 mt-3">
-                    <View className="absolute bg-black rounded-lg"
-                        style={{ top: 23, left: 4, width: "100%", height: "57%" }} />
                     <Text className="mb-1 font-semibold">DATE OF BIRTH</Text>
                     <TextInput
                         className="bg-white border border-black rounded px-4 py-4"
+                        style={{ borderWidth: 2 }}
                         placeholder="01/27/2000"
                     />
                     <Text className="text-xs text-gray-500 mt-1">
@@ -115,18 +112,16 @@ export default function driverregistration() {
                     <Text className="mb-1 font-semibold">Mobile Number</Text>
                     <View className="flex-row">
                         <View className="mr-2">
-                            <View className="absolute bg-black rounded-lg"
-                                style={{ top: 4, left: 4, width: "100%", height: "100%" }} />
                             <TextInput
                                 className="w-16 bg-white border border-black rounded px-2 py-4 text-center"
+                                style={{ borderWidth: 2 }}
                                 placeholder="+63"
                             />
                         </View>
                         <View className="flex-1">
-                            <View className="absolute bg-black rounded-lg"
-                                style={{ top: 4, left: 4, width: "100%", height: "100%" }} />
                             <TextInput
                                 className="bg-white border border-black rounded px-4 py-4"
+                                style={{ borderWidth: 2 }}
                                 placeholder="123 456 7834"
                             />
                         </View>
@@ -135,11 +130,10 @@ export default function driverregistration() {
 
                 {/* Email */}
                 <View className="mb-4 mt-3">
-                    <View className="absolute bg-black rounded-lg"
-                        style={{ top: 23, left: 4, width: "100%", height: "73%" }} />
                     <Text className="mb-1 font-semibold">EMAIL ADDRESS</Text>
                     <TextInput
                         className="bg-white border border-black rounded px-4 py-4"
+                        style={{ borderWidth: 2 }}
                         placeholder="juan06@gmail.com"
                     />
                 </View>
@@ -158,6 +152,7 @@ export default function driverregistration() {
                                 onPress={() => setGender("male")}
                                 className={`border rounded py-3 items-center ${gender === "male" ? "bg-green-600" : "bg-white border-black"
                                     }`}
+                                    style={{ borderWidth: 2 }}
                             >
                                 <Text
                                     className={`font-bold ${gender === "male" ? "text-white" : "text-black"
@@ -178,6 +173,7 @@ export default function driverregistration() {
                                 onPress={() => setGender("female")}
                                 className={`border rounded py-3 items-center ${gender === "female" ? "bg-green-600" : "bg-white border-black"
                                     }`}
+                                 style={{ borderWidth: 2 }}
                             >
                                 <Text
                                     className={`font-bold ${gender === "female" ? "text-white" : "text-black"
@@ -197,7 +193,8 @@ export default function driverregistration() {
                         style={{ top: 5, left: 4, width: "100%", height: "100%", backgroundColor: "#000" }}
                     />
                     {/* Orange button */}
-                    <Pressable className="bg-orange-500 py-4 rounded items-center"
+                    <Pressable className="bg-orange-500 py-4 rounded items-center border border-black"
+                    style={{ borderWidth: 2 }}
                     onPress={() => router.push("./vehicleinfo")}>
                         <Text className="font-bold text-black">
                             CONTINUE TO VEHICLE INFO

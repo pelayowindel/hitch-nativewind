@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 
 export default function vehicleinfo() {
     const [motorcycleType, setMotorcycleType] = useState("standard");
@@ -30,6 +31,7 @@ export default function vehicleinfo() {
     const brands = ["HONDA", "YAMAHA", "SUZUKI", "KAWASAKI"];
     const [selectedBrand, setSelectedBrand] = useState("HONDA");
     const [open, setOpen] = useState(false);
+     const router = useRouter();
 
     if (!fontsLoaded) {
         return null;
@@ -42,14 +44,16 @@ export default function vehicleinfo() {
                 <View className="flex-row items-center mb-6">
                     <View className="absolute top-1 left-1 h-full bg-black rounded-lg"
                         style={{ width: 35 }} />
-                    <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg">
+                    <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg"
+                    style={{ borderWidth: 2 }}
+                    onPress={() => router.back()}>
                         <Text className="text-2xl text-center text-black font-bold">←</Text>
                     </Pressable>
                     <Text
                         className="flex-1 text-center text-black text-xl"
                         style={{ fontFamily: "PlusJakarta-Bold" }}
                     >
-                        VEHICLE INFO
+                        VEHICLE INFORMATION
                     </Text>
                 </View>
 
@@ -88,6 +92,7 @@ export default function vehicleinfo() {
                                     ? "bg-green-600"
                                     : "bg-white border-black"
                                     }`}
+                                style={{ borderWidth: 2 }}
                             >
                                 <MaterialCommunityIcons
                                     name="motorbike"
@@ -115,6 +120,7 @@ export default function vehicleinfo() {
                                     ? "bg-green-600"
                                     : "bg-white border-black"
                                     }`}
+                                    style={{ borderWidth: 2 }}
                             >
                                 <MaterialCommunityIcons
                                     name="scooter"
@@ -136,10 +142,6 @@ export default function vehicleinfo() {
                 <Text className="text-lg font-bold mb-4">VEHICLE DETAILS</Text>
 
                 <View className="mb-3 mt-3 relative">
-                    <View
-                        className="absolute bg-black rounded-lg"
-                        style={{ top: 23, left: 4, width: "100%", height: "73%" }}
-                    />
 
                     <Text className="mb-1 font-semibold">BRAND</Text>
 
@@ -147,6 +149,7 @@ export default function vehicleinfo() {
                     <Pressable
                         onPress={() => setOpen(true)}
                         className="bg-white border border-black rounded flex-row justify-between items-center px-4 py-4"
+                        style={{ borderWidth: 2 }}
                     >
                         <Text className="text-black">{selectedBrand}</Text>
                         <Text className="text-black font-bold">▼</Text>
@@ -173,24 +176,20 @@ export default function vehicleinfo() {
 
                 {/* Model */}
                 <View className="mb-3 mt-3">
-                    <View className="absolute bg-black rounded-lg"
-                        style={{ top: 23, left: 4, width: "100%", height: "73%" }} 
-                        />
                     <Text className="mb-1 font-semibold">MODEL</Text>
                     <TextInput
                         className="bg-white border border-black rounded px-4 py-4"
+                        style={{ borderWidth: 2 }}
                         placeholder="EX. Kawasaki KR 150"
                     />
                 </View>
 
                 {/* Plate Number */}
                 <View className="mb-3 mt-3">
-                    <View className="absolute bg-black rounded-lg"
-                        style={{ top: 23, left: 4, width: "100%", height: "73%" }}
-                         />
                     <Text className="mb-1 font-semibold">PLATE NUMBER</Text>
                     <TextInput
                         className="bg-white border border-black rounded px-4 py-4"
+                        style={{ borderWidth: 2 }}
                         placeholder="9846gB"
                         value="9846gB"
                     />
@@ -198,12 +197,10 @@ export default function vehicleinfo() {
 
                 {/* Year Model */}
                 <View className="mb-3 mt-3">
-                    <View className="absolute bg-black rounded-lg"
-                        style={{ top: 23, left: 4, width: "100%", height: "73%" }}
-                         />
                     <Text className="mb-1 font-semibold">YEAR MODEL</Text>
                     <TextInput
                         className="bg-white border border-black rounded px-4 py-4"
+                        style={{ borderWidth: 2 }}
                         placeholder="2010"
                         value="2010"
                     />
@@ -218,7 +215,9 @@ export default function vehicleinfo() {
 
                     <Text className="mb-3 font-semibold">VEHICLE COLOR</Text>
 
-                    <View className="bg-white border border-black rounded p-4">
+                    <View className="bg-white border border-black rounded p-4"
+                        style={{ borderWidth: 2 }}
+                        >
                         <View className="flex-row flex-wrap">
                             {colors.map((color) => (
                                 <Pressable
@@ -257,7 +256,9 @@ export default function vehicleinfo() {
                         className="absolute rounded-lg"
                         style={{ top: 5, left: 4, width: "100%", height: "100%", backgroundColor: "#000" }}
                     />
-                    <Pressable className="bg-orange-500 py-4 rounded items-center">
+                    <Pressable className="bg-orange-500 py-4 rounded items-center border border-black"
+                    style={{ borderWidth: 2 }}
+                    >
                         <Text className="font-bold text-black">
                             CONTINUED TO DOCUMENTS
                         </Text>
