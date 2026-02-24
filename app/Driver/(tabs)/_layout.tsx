@@ -1,34 +1,40 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Tabs } from "expo-router";
+import React from "react";
 
 export default function DriverTabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#f59e0b',
-        headerTitle: 'Driver',
+        headerShown: false,          // removes "Driver/(tabs)"
+        tabBarStyle: { display: "none" }, // hide default tab bar completely
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="driver-dashboard"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <TabBarIcon name="dashboard" color={color} />,
+          title: "Home",
         }}
       />
+
       <Tabs.Screen
-        name="tab-two"
+        name="history"
         options={{
-          title: 'Earnings',
-          tabBarIcon: ({ color }) => <TabBarIcon name="money" color={color} />,
+          title: "Activity",
+        }}
+      />
+
+      <Tabs.Screen
+        name="driver-chat"
+        options={{
+          title: "Messages",
+        }}
+      />
+
+      <Tabs.Screen
+        name="driver-profile"
+        options={{
+          title: "Profile",
         }}
       />
     </Tabs>
