@@ -20,16 +20,12 @@ export default function documentupload() {
       <ScrollView className="flex-1 px-4 pt-6">
         {/* Header */}
         <View className="flex-row items-center mb-6">
-          <View
-            className="absolute top-1 left-1 h-full bg-black rounded-lg"
-            style={{ width: 35 }}
-          />
-          <Pressable
-            onPress={() => router.back()}
-            className="w-10 h-10 bg-white rounded border border-black items-center justify-center"
+          <View className="absolute top-1 left-1 h-full bg-black rounded-lg"
+            style={{ width: 35 }} />
+          <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg"
             style={{ borderWidth: 2 }}
-          >
-            <Text className="text-xl font-bold">←</Text>
+            onPress={() => router.back()}>
+            <Text className="text-2xl text-center text-black font-bold">←</Text>
           </Pressable>
 
           <Text
@@ -109,7 +105,7 @@ export default function documentupload() {
                   <MaterialCommunityIcons name="cloud-upload" size={22} color="#000" />
                 </View>
                 <Text className="font-bold text-xs">TAP TO UPLOAD</Text>
-                <Text className="text-xs text-gray-500 mt-1">{item}</Text>
+                <Text className="text-xs font-semibold text-gray-500 mt-1">{item}</Text>
               </Pressable>
             ))}
           </View>
@@ -127,7 +123,7 @@ export default function documentupload() {
               <MaterialCommunityIcons name="cloud-upload" size={22} color="#000" />
             </View>
             <Text className="font-bold text-xs">TAP TO UPLOAD</Text>
-            <Text className="text-xs text-gray-400 mt-1">PNG, JPG, PDF (max 5mb)</Text>
+            <Text className="text-xs font-semibold text-gray-400 mt-1">PNG, JPG, PDF (max 5mb)</Text>
           </Pressable>
         </View>
 

@@ -3,31 +3,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { useState, useRef } from "react";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import FloatingLoading from "../../constants/floatingloading";
 
 export default function driverregistration() {
     const [gender, setGender] = useState("male");
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
-    const floatAnim = useRef(new Animated.Value(0)).current;;
-
-
-    const startFloating = () => {
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(floatAnim, {
-                    toValue: -10,
-                    duration: 600,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(floatAnim, {
-                    toValue: 0,
-                    duration: 600,
-                    useNativeDriver: true,
-                }),
-            ])
-        ).start();
-    };
+    const [loading, setLoading] = useState<boolean>(false);
+   
 
 
     const [fontsLoaded] = useFonts({
@@ -50,7 +32,7 @@ export default function driverregistration() {
                         style={{ width: 35 }} />
                     <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg"
                         style={{ borderWidth: 2 }}
-                        onPress={() => router.back()}>
+                        onPress={() => router.push("/LogIn")}>
                         <Text className="text-2xl text-center text-black font-bold">←</Text>
                     </Pressable>
                     <Text
@@ -120,7 +102,6 @@ export default function driverregistration() {
                             style={{ borderWidth: 2 }}
                             onPress={() => {
                                 setLoading(true);
-                                startFloating();
 
                                 setTimeout(() => {
                                     setLoading(false);
@@ -134,45 +115,8 @@ export default function driverregistration() {
                         </Pressable>
                     </View>
                 </View>
-
             </View>
-
-
-            {loading && (
-                <View
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: "rgba(0,0,0,0.35)",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        zIndex: 100,
-                    }}
-                >
-                    <Animated.View
-                        style={{
-                            transform: [{ translateY: floatAnim }],
-                            backgroundColor: "white",
-                            padding: 24,
-                            borderRadius: 16,
-                            borderWidth: 2,
-                            borderColor: "black",
-                        }}
-                    >
-                        <MaterialCommunityIcons
-                            name="motorbike"
-                            size={48}
-                            color="black"
-                        />
-                        <Text className="mt-2 font-bold text-center">
-                            Loading...
-                        </Text>
-                    </Animated.View>
-                </View>
-            )}
+             <FloatingLoading visible={loading} label="LOADING..." />
         </SafeAreaView>
     );
 }
