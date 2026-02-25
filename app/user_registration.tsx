@@ -1,7 +1,17 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView, TouchableWithoutFeedback } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+  ScrollView,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useFonts } from "expo-font";
 
 /* =============================
    SLIP CARD
@@ -17,12 +27,7 @@ function SlipCard({
     <View className={`relative ${styleClass}`}>
       <View
         className="absolute bg-black rounded-md"
-        style={{
-          width: "100%",
-          height: "100%",
-          top: 4,
-          left: 4,
-        }}
+        style={{ width: "100%", height: "100%", top: 4, left: 4 }}
       />
       <View className="bg-white border-[3px] border-black rounded-md p-3">
         {children}
@@ -36,97 +41,124 @@ function SlipCard({
 ============================= */
 function SlipButton({
   text,
-  icon,
   color,
   onPress,
 }: {
   text: string;
-  icon?: React.ReactNode;
   color: string;
   onPress?: () => void;
 }) {
   const [pressed, setPressed] = useState(false);
 
   return (
-    <TouchableWithoutFeedback
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={onPress}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      onPress={onPress}  // ← This triggers the action
     >
       <View className="items-center mb-4">
-
         <View className="relative w-full">
-
-          {/* Slip Shadow */}
           {!pressed && (
             <View
               className="absolute bg-black rounded-md"
-              style={{
-                width: "100%",
-                height: "100%",
-                top: 4,
-                left: 4,
-                opacity: 10,
-              }}
+              style={{ width: "100%", height: "100%", top: 4, left: 4 }}
             />
           )}
-
-          {/* Button Body */}
           <View
             className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
             style={{
               backgroundColor: color,
-              transform: pressed
-                ? [{ translateX: 2 }, { translateY: 2 }]
-                : [],
+              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
             }}
           >
-            {icon && <View className="mr-2">{icon}</View>}
-            <Text className="font-bold text-black text-lg">{text}</Text>
+            <Text
+              style={{ fontFamily: "PlusJakarta-Bold" }}
+              className="text-black text-lg"
+            >
+              {text}
+            </Text>
           </View>
-
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 }
 
+/* =============================
+   USER REGISTRATION
+============================= */
 export default function UserRegistration() {
   const [gender, setGender] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const router = useRouter();
 
   const genders = ["MALE", "FEMALE"];
+
+  // ===== Load Custom Fonts =====
+  const [fontsLoaded] = useFonts({
+    "PlusJakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
+    "PlusJakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
+    "PlusJakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null; // Optionally, add a loading indicator
+  }
+
+  const handleRegister = () => {
+    setIsRegistering(true);
+    setModalVisible(true);
+
+    setTimeout(() => {
+      setIsRegistering(false); // Show "Registered Successfully"
+    }, 2000);
+  };
+
+  const handleProceed = () => {
+    setModalVisible(false);
+    router.push("/LogIn");
+  };
 
   return (
     <View className="flex-1 bg-[#D9D9D9]">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={true}>
         <View className="px-4 py-6">
-          {/* PAGE TITLE */}
-          <Text className="text-gray-500 text-xs mb-4">user registration</Text>
+          <Text
+            style={{ fontFamily: "PlusJakarta-Regular" }}
+            className="text-gray-500 text-xs mb-4"
+          >
+            user registration
+          </Text>
 
           {/* HEADER */}
           <View className="flex-row items-center mb-6 pb-2 border-b border-black">
-            {/* ←←← ARROW BACK BUTTON WITH IONICON →→→ */}
             <TouchableOpacity
               className="p-2 bg-gray-300 rounded"
               onPress={() => router.back()}
             >
               <Ionicons name="arrow-back" size={20} color="black" />
             </TouchableOpacity>
-            {/* ←←← END OF ARROW BACK BUTTON →→→ */}
-
-            <Text className="flex-1 text-center text-lg font-semibold tracking-wider">
+            <Text
+              style={{ fontFamily: "PlusJakarta-Bold" }}
+              className="flex-1 text-center text-lg tracking-wider"
+            >
               REGISTRATION
             </Text>
-
             <View className="w-8" />
           </View>
 
           {/* SECTION TITLE */}
           <View className="items-center mb-4">
-            <Text className="font-bold text-lg">PERSONAL INFO</Text>
-            <Text className="text-gray-600 text-xs">
+            <Text style={{ fontFamily: "PlusJakarta-Bold" }} className="text-lg">
+              PERSONAL INFO
+            </Text>
+            <Text
+              style={{ fontFamily: "PlusJakarta-Regular" }}
+              className="text-gray-600 text-xs"
+            >
               Let’s start with your basic details
             </Text>
           </View>
@@ -136,30 +168,44 @@ export default function UserRegistration() {
             {/* NAME ROW */}
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Text className="font-semibold mb-1">FIRST NAME</Text>
+                <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                  FIRST NAME
+                </Text>
                 <SlipCard>
-                  <TextInput placeholder="Juan" />
+                  <TextInput
+                    placeholder="Juan"
+                    style={{ fontFamily: "PlusJakarta-Regular" }}
+                  />
                 </SlipCard>
               </View>
 
               <View className="flex-1">
-                <Text className="font-semibold mb-1">LAST NAME</Text>
+                <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                  LAST NAME
+                </Text>
                 <SlipCard>
-                  <TextInput placeholder="Dela Cruz" />
+                  <TextInput
+                    placeholder="Dela Cruz"
+                    style={{ fontFamily: "PlusJakarta-Regular" }}
+                  />
                 </SlipCard>
               </View>
             </View>
 
             {/* GENDER DROPDOWN */}
             <View>
-              <Text className="font-semibold mb-1">GENDER</Text>
+              <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                GENDER
+              </Text>
               <SlipCard>
                 <View>
                   <Pressable
                     onPress={() => setDropdownOpen(!dropdownOpen)}
                     className="flex-row justify-between items-center"
                   >
-                    <Text className="font-bold">{gender || "Select Gender"}</Text>
+                    <Text style={{ fontFamily: "PlusJakarta-Bold" }}>
+                      {gender || "Select Gender"}
+                    </Text>
                     <Text className="text-lg">{dropdownOpen ? "▲" : "▼"}</Text>
                   </Pressable>
 
@@ -174,7 +220,9 @@ export default function UserRegistration() {
                           }}
                           className="p-3 border-b border-black last:border-b-0"
                         >
-                          <Text className="text-center font-bold">{item}</Text>
+                          <Text style={{ fontFamily: "PlusJakarta-Bold" }} className="text-center">
+                            {item}
+                          </Text>
                         </Pressable>
                       ))}
                     </View>
@@ -185,46 +233,59 @@ export default function UserRegistration() {
 
             {/* ADDRESS */}
             <View>
-              <Text className="font-semibold mb-1">ADDRESS</Text>
+              <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                ADDRESS
+              </Text>
               <SlipCard>
-                <TextInput placeholder="Random Place - Bogo City, Cebu" />
+                <TextInput
+                  placeholder="Random Place - Bogo City, Cebu"
+                  style={{ fontFamily: "PlusJakarta-Regular" }}
+                />
               </SlipCard>
             </View>
 
             {/* DATE OF BIRTH */}
             <View>
-              <Text className="font-semibold mb-1">DATE OF BIRTH</Text>
+              <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                DATE OF BIRTH
+              </Text>
               <SlipCard>
-                <TextInput placeholder="01/27/2000" />
+                <TextInput
+                  placeholder="01/27/2000"
+                  style={{ fontFamily: "PlusJakarta-Regular" }}
+                />
               </SlipCard>
-              <Text className="text-gray-700 text-[11px] mt-1">
+              <Text
+                style={{ fontFamily: "PlusJakarta-Regular" }}
+                className="text-gray-700 text-[11px] mt-1"
+              >
                 You must be at least 18 years old to drive
               </Text>
             </View>
 
             {/* MOBILE NUMBER */}
             <View>
-              <Text className="font-semibold mb-1">Mobile Number</Text>
+              <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                Mobile Number
+              </Text>
               <View className="flex-row gap-3">
-                {/* COUNTRY CODE */}
                 <View className="w-24">
                   <SlipCard>
                     <TextInput
                       value="+63"
                       editable={false}
-                      className="text-center font-bold"
+                      style={{ fontFamily: "PlusJakarta-Bold", textAlign: "center" }}
                     />
                   </SlipCard>
                 </View>
 
-                {/* PHONE NUMBER */}
                 <View className="flex-1">
                   <SlipCard>
                     <TextInput
                       placeholder="123 456 7834"
                       keyboardType="number-pad"
                       maxLength={12}
-                      className="font-semibold"
+                      style={{ fontFamily: "PlusJakarta-Bold" }}
                     />
                   </SlipCard>
                 </View>
@@ -233,21 +294,60 @@ export default function UserRegistration() {
 
             {/* EMAIL */}
             <View>
-              <Text className="font-semibold mb-1">EMAIL ADDRESS</Text>
+              <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
+                EMAIL ADDRESS
+              </Text>
               <SlipCard>
-                <TextInput placeholder="juan06@gmail.com" />
+                <TextInput
+                  placeholder="juan06@gmail.com"
+                  style={{ fontFamily: "PlusJakarta-Regular" }}
+                />
               </SlipCard>
             </View>
 
             {/* REGISTER BUTTON */}
-            <SlipButton
-              text="REGISTER"
-              color="#00FF38"
-              onPress={() => router.push("/confirm_registration")}
-            />
+            <SlipButton text="REGISTER" color="#00FF38" onPress={handleRegister} />
           </View>
         </View>
       </ScrollView>
+
+      {/* =============================
+          REGISTERING MODAL
+      ============================= */}
+      <Modal visible={modalVisible} transparent animationType="fade">
+        <View className="flex-1 bg-black/50 justify-center items-center px-6">
+          <View className="bg-white border-2 border-black rounded-md p-6 w-full relative">
+            {isRegistering ? (
+              <>
+                <Text style={{ fontFamily: "PlusJakarta-Bold" }} className="text-center text-lg mb-4">
+                  Registering...
+                </Text>
+                <Text style={{ fontFamily: "PlusJakarta-Regular" }} className="text-center text-gray-700 mb-4">
+                  Please wait while we create your account.
+                </Text>
+                <ActivityIndicator size="large" color="#00FF38" />
+              </>
+            ) : (
+              <>
+                <Text style={{ fontFamily: "PlusJakarta-Bold" }} className="text-center text-lg mb-4">
+                  Registered Successfully!
+                </Text>
+                <Text style={{ fontFamily: "PlusJakarta-Regular" }} className="text-center text-gray-700 mb-6">
+                  Your account has been created.
+                </Text>
+                <TouchableOpacity
+                  className="bg-green-400 py-3 rounded-md border-2 border-black"
+                  onPress={handleProceed}
+                >
+                  <Text style={{ fontFamily: "PlusJakarta-Bold" }} className="text-center text-black">
+                    OK
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

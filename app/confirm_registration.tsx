@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,15 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TouchableWithoutFeedback,
+  Modal,
+  Animated,
+  Easing,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useFonts } from "expo-font";
 
 /* =============================
    SLIP CARD (Drop Shadow Wrapper)
@@ -23,17 +28,10 @@ function SlipCard({
 }) {
   return (
     <View className={`relative ${styleClass}`}>
-      {/* Shadow Layer */}
       <View
         className="absolute bg-black rounded-md"
-        style={{
-          width: "100%",
-          height: "100%",
-          top: 4,
-          left: 4,
-        }}
+        style={{ width: "100%", height: "100%", top: 4, left: 4 }}
       />
-      {/* Main Card */}
       <View className="bg-white border-2 border-black rounded-md">{children}</View>
     </View>
   );
@@ -63,20 +61,12 @@ function SlipButton({
     >
       <View className="items-center mb-4">
         <View className="relative w-full">
-          {/* Slip Shadow */}
           {!pressed && (
             <View
               className="absolute bg-black rounded-md"
-              style={{
-                width: "100%",
-                height: "100%",
-                top: 4,
-                left: 4,
-                opacity: 10,
-              }}
+              style={{ width: "100%", height: "100%", top: 4, left: 4 }}
             />
           )}
-          {/* Button Body */}
           <View
             className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
             style={{
@@ -85,7 +75,12 @@ function SlipButton({
             }}
           >
             {icon && <View className="mr-2">{icon}</View>}
-            <Text className="font-bold text-black text-lg">{text}</Text>
+            <Text
+              style={{ fontFamily: "PlusJakarta-Bold" }}
+              className="text-black text-lg"
+            >
+              {text}
+            </Text>
           </View>
         </View>
       </View>
@@ -96,21 +91,121 @@ function SlipButton({
 const RegistrationScreen: React.FC = () => {
   const router = useRouter();
 
-  // ────────── DEFAULT EMAIL & PASSWORD ──────────
+  /* =============================
+     STATE
+  ============================= */
+  const [loading, setLoading] = useState(true);
+  const [verifying, setVerifying] = useState(false);
   const [email, setEmail] = useState<string>("demo@gmail.com");
   const [password, setPassword] = useState<string>("123");
   const [confirmPassword, setConfirmPassword] = useState<string>("123");
-  // ──────────────────────────────────────────────
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [verificationCode, setVerificationCode] = useState<string>("");
 
-  // Navigate to login
+  /* =============================
+     LOAD FONTS
+  ============================= */
+  const [fontsLoaded] = useFonts({
+    "PlusJakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
+    "PlusJakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
+    "PlusJakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null; // Optional: Add loading indicator
+  }
+
+  /* =============================
+     ANIMATIONS
+  ============================= */
+  const loadingFloatAnim = useRef(new Animated.Value(0)).current;
+  const modalFloatAnim = useRef(new Animated.Value(0)).current;
+
+  const startFloating = (anim: Animated.Value, amplitude = 20, duration = 800) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(anim, {
+          toValue: -amplitude,
+          duration: duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim, {
+          toValue: amplitude,
+          duration: duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  useEffect(() => {
+    startFloating(loadingFloatAnim);
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (verifying) {
+      startFloating(modalFloatAnim, 15, 600);
+    } else {
+      modalFloatAnim.setValue(0);
+    }
+  }, [verifying]);
+
+  /* =============================
+     HANDLERS
+  ============================= */
   const handleRegister = () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-    router.push("/LogIn");
+    setModalVisible(true);
   };
 
+  const handleVerify = () => {
+    setVerifying(true);
+
+    setTimeout(() => {
+      setVerifying(false);
+
+      if (verificationCode === "123456") {
+        setModalVisible(false);
+        router.push("/user_registration");
+      } else {
+        alert("Invalid verification code");
+      }
+    }, 1500);
+  };
+
+  /* =============================
+     RENDER LOADING SCREEN
+  ============================= */
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center bg-gray-200">
+        <Animated.View style={{ transform: [{ translateY: loadingFloatAnim }] }}>
+          <MaterialCommunityIcons name="motorbike" size={80} color="#000000" />
+        </Animated.View>
+        <Text
+          style={{ fontFamily: "PlusJakarta-Bold" }}
+          className="mt-6 text-black text-lg"
+        >
+          Loading...
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  /* =============================
+     RENDER REGISTRATION FORM
+  ============================= */
   return (
     <SafeAreaView className="flex-1 bg-gray-200 px-6 pt-12">
       <StatusBar style="dark" />
@@ -124,7 +219,10 @@ const RegistrationScreen: React.FC = () => {
           <Ionicons name="arrow-back" size={20} color="black" />
         </TouchableOpacity>
 
-        <Text className="flex-1 text-center text-lg font-semibold tracking-wider">
+        <Text
+          style={{ fontFamily: "PlusJakarta-Bold" }}
+          className="flex-1 text-center text-lg tracking-wider"
+        >
           REGISTRATION
         </Text>
 
@@ -133,48 +231,102 @@ const RegistrationScreen: React.FC = () => {
 
       <View className="border-b border-black mb-6" />
 
-      {/* Subtitle */}
-      <Text className="text-center font-semibold mb-8">COMPLETE TO LOG IN</Text>
+      <Text
+        style={{ fontFamily: "PlusJakarta-Medium" }}
+        className="text-center mb-8 text-lg"
+      >
+        COMPLETE TO LOG IN
+      </Text>
 
       {/* Email */}
-      <Text className="mb-2 text-xs font-semibold">EMAIL ADDRESS</Text>
+      <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
+        EMAIL ADDRESS
+      </Text>
       <SlipCard styleClass="mb-6">
         <TextInput
           value={email}
           onChangeText={setEmail}
           placeholder="juan06@gmail.com"
           className="px-4 py-3"
+          style={{ fontFamily: "PlusJakarta-Regular" }}
         />
       </SlipCard>
 
       {/* Password */}
-      <Text className="mb-2 text-xs font-semibold">PASSWORD</Text>
+      <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
+        PASSWORD
+      </Text>
       <SlipCard styleClass="mb-6">
         <TextInput
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           className="px-4 py-3"
+          style={{ fontFamily: "PlusJakarta-Regular" }}
         />
       </SlipCard>
 
       {/* Confirm Password */}
-      <Text className="mb-2 text-xs font-semibold">CONFIRM PASSWORD</Text>
+      <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
+        CONFIRM PASSWORD
+      </Text>
       <SlipCard styleClass="mb-12">
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
           className="px-4 py-3"
+          style={{ fontFamily: "PlusJakarta-Regular" }}
         />
       </SlipCard>
 
-      {/* Continue Button as SlipButton */}
-      <SlipButton
-        text="CONTINUE TO LOG IN"
-        color="#00FF38"
-        onPress={handleRegister}
-      />
+      <SlipButton text="CONTINUE" color="#00FF38" onPress={handleRegister} />
+
+      {/* Verification Modal */}
+      <Modal visible={modalVisible} transparent animationType="fade">
+        <View className="flex-1 bg-black/50 justify-center items-center px-6">
+          <View className="bg-white border-2 border-black rounded-md p-6 w-full relative">
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}
+            >
+              <Ionicons name="close" size={24} color="black" />
+            </TouchableOpacity>
+
+            <Text
+              style={{ fontFamily: "PlusJakarta-Bold" }}
+              className="text-center mb-4 text-lg"
+            >
+              ENTER VERIFICATION CODE
+            </Text>
+
+            <TextInput
+              value={verificationCode}
+              onChangeText={setVerificationCode}
+              placeholder="Enter 6-digit code"
+              keyboardType="numeric"
+              className="border-2 border-black rounded-md px-4 py-3 mb-6"
+              style={{ fontFamily: "PlusJakarta-Regular" }}
+            />
+
+            {verifying ? (
+              <View className="flex-row justify-center items-center">
+                <Animated.View style={{ transform: [{ translateY: modalFloatAnim }] }}>
+                  <MaterialCommunityIcons name="motorbike" size={48} color="#000000" />
+                </Animated.View>
+                <Text
+                  style={{ fontFamily: "PlusJakarta-Bold" }}
+                  className="ml-4 text-black"
+                >
+                  Verifying...
+                </Text>
+              </View>
+            ) : (
+              <SlipButton text="VERIFY" color="#00FF38" onPress={handleVerify} />
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

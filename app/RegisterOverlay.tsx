@@ -47,7 +47,7 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               icon={<FontAwesome name="user" size={18} color="black" />}
               onPress={() => {
                 onClose();
-                router.push("/user_registration");
+                router.push("/confirm_registration");
               }}
             />
 
