@@ -258,6 +258,7 @@ export default function vehicleinfo() {
                     />
                     <Pressable className="bg-orange-500 py-4 rounded items-center border border-black"
                     style={{ borderWidth: 2 }}
+                    onPress={() => router.push("./driverducoments")}
                     >
                         <Text className="font-bold text-black">
                             CONTINUED TO DOCUMENTS
