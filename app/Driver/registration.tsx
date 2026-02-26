@@ -116,7 +116,7 @@ export default function driverregistration() {
                     </View>
                 </View>
             </View>
-             <FloatingLoading visible={loading} label="LOADING..." />
+             <FloatingLoading visible={loading} label="LOADING...." />
         </SafeAreaView>
     );
 }
