@@ -1,5 +1,5 @@
 
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import {
   Pressable,
   Text,
@@ -103,7 +103,10 @@ export default function RiderDashboardScreen() {
         </View>
 
         {/* Request Ride Button */}
-        <Pressable className="flex-row items-center justify-center gap-3 rounded-xl border-[3px] border-black bg-black px-6 py-5 shadow-[4px_4px_0_0_#000] active:translate-y-1">
+        <Pressable
+          onPress={() => router.push('/Rider/ride-request' as Href)}
+          className="flex-row items-center justify-center gap-3 rounded-xl border-[3px] border-black bg-black px-6 py-5 shadow-[4px_4px_0_0_#000] active:translate-y-1"
+        >
           <Text className="text-lg font-extrabold uppercase tracking-wide text-white">
             Request Ride
           </Text>
