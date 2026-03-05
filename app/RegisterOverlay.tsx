@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableWithoutFeedback, Modal } from "react-native";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 interface Props {
@@ -12,20 +12,13 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
   const router = useRouter();
 
   return (
-    <Modal
-      transparent
-      animationType="fade"
-      visible={visible}
-    >
+    <Modal transparent animationType="fade" visible={visible}>
       {/* Dark Background */}
       <View className="flex-1 bg-black/40 justify-center items-center">
-
         {/* Modal Card */}
         <View className="w-[90%] bg-[#D9D9D9] rounded-xl border-2 border-black overflow-hidden">
-
           {/* Header */}
           <View className="flex-row items-center justify-center p-4 border-b-2 border-black relative">
-
             {/* Close Button */}
             <TouchableWithoutFeedback onPress={onClose}>
               <View className="absolute left-4 bg-red-500 w-8 h-8 justify-center items-center border-2 border-black">
@@ -33,18 +26,15 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               </View>
             </TouchableWithoutFeedback>
 
-            <Text className="text-black text-lg font-bold">
-              REGISTER AS
-            </Text>
+            <Text className="text-black text-lg font-bold">REGISTER AS</Text>
           </View>
 
           {/* Body */}
           <View className="p-8 items-center">
-
             <SlipButton
               text="COMMUTER"
               color="#19D226"
-              icon={<FontAwesome name="user" size={18} color="black" />}
+              icon={<FontAwesome6 name="user" size={18} color="black" />}
               onPress={() => {
                 onClose();
                 router.push("/confirm_registration");
@@ -56,8 +46,8 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
             <SlipButton
               text="REGISTER AS DRIVER"
               color="#FF8C00"
-              icon={<FontAwesome name="motorcycle" size={18} color="black" />}
-            /> 
+              icon={<FontAwesome6 name="motorcycle" size={18} color="black" />}
+            />
           </View>
         </View>
       </View>
@@ -85,10 +75,7 @@ function SlipButton({
       onPress={onPress}
     >
       <View className="items-center mb-4">
-
         <View className="relative w-[260px]">
-
-          {/* Slip Shadow */}
           {!pressed && (
             <View
               className="absolute bg-black rounded-sm"
@@ -97,7 +84,7 @@ function SlipButton({
                 height: "100%",
                 top: 4,
                 left: 4,
-                opacity: 10,
+                opacity: 0.1,
               }}
             />
           )}
@@ -106,19 +93,14 @@ function SlipButton({
             className="py-4 rounded-sm border-2 border-black flex-row justify-center items-center"
             style={{
               backgroundColor: color,
-              transform: pressed
-                ? [{ translateX: 2 }, { translateY: 2 }]
-                : [],
+              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
             }}
           >
             {icon && <View className="mr-2">{icon}</View>}
             <Text className="font-bold text-black">{text}</Text>
           </View>
-
         </View>
       </View>
     </TouchableWithoutFeedback>
-    
   );
-  
 }

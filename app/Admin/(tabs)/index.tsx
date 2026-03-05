@@ -8,7 +8,7 @@ export default function AdminOverviewScreen() {
   const [weight, setWeight] = useState('');
 
   return (
-    <View className="flex-1 bg-white px-6 py-10">
+    <View className="flex-1 bg-wh ite px-6 py-10">
       <View className="mb-8">
         <Text className="text-2xl font-bold text-violet-700">Admin overview</Text>
         <Text className="mt-3 text-base text-slate-600">
