@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableWithoutFeedback, Modal } from "react-native";
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { router } from "expo-router";
 
 interface Props {
   visible: boolean;
@@ -47,6 +48,10 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               text="REGISTER AS DRIVER"
               color="#FF8C00"
               icon={<FontAwesome6 name="motorcycle" size={18} color="black" />}
+              onPress={() => {
+                onClose();
+                router.push("./Driver/registration");
+              }}
             />
           </View>
         </View>
