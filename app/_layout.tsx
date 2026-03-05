@@ -28,9 +28,12 @@ export default function RootLayout() {
     <SupabaseProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="user_registration" options={{ headerShown: false }} />
+        <Stack.Screen name="driver_registration" options={{ headerShown: false }} />
         <Stack.Screen name="Rider" options={{ headerShown: false }} />
         <Stack.Screen name="Driver" options={{ headerShown: false }} />
         <Stack.Screen name="Admin" options={{ headerShown: false }} />
+        <Stack.Screen name="confirm_registration" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </SupabaseProvider>
