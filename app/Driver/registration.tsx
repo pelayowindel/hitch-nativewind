@@ -1,20 +1,91 @@
-import { View, Text, TextInput, Pressable, Animated } from "react-native";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import FloatingLoading from "../../constants/floatingloading";
 import useAppFonts from "../../hooks/useAppFonts";
+import { supabase } from "../../lib/supabase";
 
 export default function driverregistration() {
-    const [gender, setGender] = useState("male");
+    const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [retryAt, setRetryAt] = useState<number | null>(null);
    
     const fontsLoaded = useAppFonts();
+
+    useEffect(() => {
+        if (!retryAt) return;
+
+        const timeoutMs = Math.max(0, retryAt - Date.now());
+        const timer = setTimeout(() => setRetryAt(null), timeoutMs);
+
+        return () => clearTimeout(timer);
+    }, [retryAt]);
 
     if (!fontsLoaded) {
         return null;
     }
+
+    const handleContinue = async () => {
+        if (loading) return;
+
+        const isCoolingDown = !!retryAt && retryAt > Date.now();
+        if (isCoolingDown) {
+            const secondsLeft = Math.ceil((retryAt - Date.now()) / 1000);
+            Alert.alert("Please wait", `Too many attempts. Try again in ${secondsLeft}s.`);
+            return;
+        }
+
+        if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+            Alert.alert("Missing fields", "Email, password, and confirm password are required.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Alert.alert("Password mismatch", "Password and confirm password must match.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const { error } = await supabase.auth.signUp({
+                email: email.trim(),
+                password,
+            });
+
+            if (error) {
+                const isRateLimited =
+                    error.status === 429 ||
+                    error.code === "over_email_send_rate_limit" ||
+                    error.message?.toLowerCase().includes("rate limit");
+
+                if (isRateLimited) {
+                    setRetryAt(Date.now() + SIGNUP_RETRY_COOLDOWN_MS);
+                    Alert.alert(
+                        "Email limit reached",
+                        "Please wait about 60 seconds before requesting another signup email."
+                    );
+                    return;
+                }
+
+                Alert.alert("Signup failed", error.message);
+                return;
+            }
+
+            Alert.alert("Account created", "Now continue with your driver details.", [
+                { text: "OK", onPress: () => router.push("/Driver/driverregistration") },
+            ]);
+        } catch (_error) {
+            Alert.alert("Network error", "Could not register right now. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-gray-200">
@@ -53,6 +124,8 @@ export default function driverregistration() {
                             placeholder="juan06@gmail.com"
                             keyboardType="email-address"
                             autoCapitalize="none"
+                            value={email}
+                            onChangeText={setEmail}
                         />
                     </View>
 
@@ -64,6 +137,8 @@ export default function driverregistration() {
                             style={{ borderWidth: 2 }}
                             placeholder="Enter password"
                             secureTextEntry
+                            value={password}
+                            onChangeText={setPassword}
                         />
                     </View>
 
@@ -75,6 +150,8 @@ export default function driverregistration() {
                             style={{ borderWidth: 2 }}
                             placeholder="Confirm password"
                             secureTextEntry
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
                         />
                     </View>
                     {/* Continue Button */}
@@ -94,17 +171,14 @@ export default function driverregistration() {
                         <Pressable
                             className="bg-orange-500 py-4 rounded items-center border border-black"
                             style={{ borderWidth: 2 }}
-                            onPress={() => {
-                                setLoading(true);
-
-                                setTimeout(() => {
-                                    setLoading(false);
-                                    router.push("./driverregistration");
-                                }, 1500);
-                            }}
+                            onPress={loading || (retryAt !== null && retryAt > Date.now()) ? undefined : handleContinue}
                         >
                             <Text className="font-bold text-black">
-                                CONTINUE
+                                {loading
+                                    ? "CREATING ACCOUNT..."
+                                    : retryAt && retryAt > Date.now()
+                                    ? "PLEASE WAIT"
+                                    : "CONTINUE"}
                             </Text>
                         </Pressable>
                     </View>
