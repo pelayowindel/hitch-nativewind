@@ -56,6 +56,11 @@ export default function driverregistration() {
             const { error } = await supabase.auth.signUp({
                 email: email.trim(),
                 password,
+                options: {
+                    data: {
+                        requested_role: "driver",
+                    },
+                },
             });
 
             if (error) {
