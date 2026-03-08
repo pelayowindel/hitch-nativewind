@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
-  TouchableWithoutFeedback,
   Modal,
   Animated,
   Easing,
@@ -14,102 +13,32 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useFonts } from "expo-font";
-
-/* =============================
-   SLIP CARD (Drop Shadow Wrapper)
-============================= */
-function SlipCard({
-  children,
-  styleClass = "",
-}: {
-  children: React.ReactNode;
-  styleClass?: string;
-}) {
-  return (
-    <View className={`relative ${styleClass}`}>
-      <View
-        className="absolute bg-black rounded-md"
-        style={{ width: "100%", height: "100%", top: 4, left: 4 }}
-      />
-      <View className="bg-white border-2 border-black rounded-md">{children}</View>
-    </View>
-  );
-}
-
-/* =============================
-   SLIP BUTTON
-============================= */
-function SlipButton({
-  text,
-  icon,
-  color,
-  onPress,
-}: {
-  text: string;
-  icon?: React.ReactNode;
-  color: string;
-  onPress?: () => void;
-}) {
-  const [pressed, setPressed] = useState(false);
-
-  return (
-    <TouchableWithoutFeedback
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-      onPress={onPress}
-    >
-      <View className="items-center mb-4">
-        <View className="relative w-full">
-          {!pressed && (
-            <View
-              className="absolute bg-black rounded-md"
-              style={{ width: "100%", height: "100%", top: 4, left: 4 }}
-            />
-          )}
-          <View
-            className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
-            style={{
-              backgroundColor: color,
-              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
-            }}
-          >
-            {icon && <View className="mr-2">{icon}</View>}
-            <Text
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-              className="text-black text-lg"
-            >
-              {text}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
-  );
-}
+import { supabase } from "../lib/supabase";
+import SlipCard from "../components/ui/SlipCard";
+import SlipButton from "../components/ui/SlipButton";
+import useAppFonts from "../hooks/useAppFonts";
 
 const RegistrationScreen: React.FC = () => {
   const router = useRouter();
+  const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
 
   /* =============================
      STATE
   ============================= */
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
-  const [email, setEmail] = useState<string>("demo@gmail.com");
-  const [password, setPassword] = useState<string>("123");
-  const [confirmPassword, setConfirmPassword] = useState<string>("123");
+  const [registering, setRegistering] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [verificationCode, setVerificationCode] = useState<string>("");
+  const [retryAt, setRetryAt] = useState<number | null>(null);
 
   /* =============================
      LOAD FONTS
   ============================= */
-  const [fontsLoaded] = useFonts({
-    "PlusJakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "PlusJakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "PlusJakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
-  });
+  const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) {
     return null; // Optional: Add loading indicator
@@ -158,15 +87,68 @@ const RegistrationScreen: React.FC = () => {
     }
   }, [verifying]);
 
+  useEffect(() => {
+    if (!retryAt) return;
+
+    const timeoutMs = Math.max(0, retryAt - Date.now());
+    const timer = setTimeout(() => setRetryAt(null), timeoutMs);
+
+    return () => clearTimeout(timer);
+  }, [retryAt]);
+
   /* =============================
      HANDLERS
   ============================= */
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    const isCoolingDown = !!retryAt && retryAt > Date.now();
+
+    if (isCoolingDown) {
+      const secondsLeft = Math.ceil((retryAt - Date.now()) / 1000);
+      alert(`Too many attempts. Please wait ${secondsLeft}s before trying again.`);
+      return;
+    }
+
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-    setModalVisible(true);
+
+    if (!email.trim() || !password.trim()) {
+      alert("Email and password are required");
+      return;
+    }
+
+    try {
+      setRegistering(true);
+
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        const isRateLimited =
+          error.status === 429 ||
+          error.code === "over_email_send_rate_limit" ||
+          error.message?.toLowerCase().includes("rate limit");
+
+        if (isRateLimited) {
+          setRetryAt(Date.now() + SIGNUP_RETRY_COOLDOWN_MS);
+          alert("Email send limit reached. Please wait about 60 seconds, then try again.");
+          return;
+        }
+
+        alert(error.message);
+        return;
+      }
+
+      alert("Registration successful. Please log in.");
+      router.replace("/LogIn");
+    } catch (_err) {
+      alert("Unable to register right now. Please try again.");
+    } finally {
+      setRegistering(false);
+    }
   };
 
   const handleVerify = () => {
@@ -242,7 +224,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
         EMAIL ADDRESS
       </Text>
-      <SlipCard styleClass="mb-6">
+      <SlipCard containerClassName="mb-6">
         <TextInput
           value={email}
           onChangeText={setEmail}
@@ -256,7 +238,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
         PASSWORD
       </Text>
-      <SlipCard styleClass="mb-6">
+      <SlipCard containerClassName="mb-6">
         <TextInput
           value={password}
           onChangeText={setPassword}
@@ -270,7 +252,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
         CONFIRM PASSWORD
       </Text>
-      <SlipCard styleClass="mb-12">
+      <SlipCard containerClassName="mb-12">
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -280,7 +262,19 @@ const RegistrationScreen: React.FC = () => {
         />
       </SlipCard>
 
-      <SlipButton text="CONTINUE" color="#00FF38" onPress={handleRegister} />
+      <SlipButton
+        text={
+          registering
+            ? "CREATING ACCOUNT..."
+            : retryAt && retryAt > Date.now()
+            ? "PLEASE WAIT"
+            : "CONTINUE"
+        }
+        color="#00FF38"
+        textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+        disabled={registering || (retryAt !== null && retryAt > Date.now())}
+        onPress={registering || (retryAt !== null && retryAt > Date.now()) ? undefined : handleRegister}
+      />
 
       {/* Verification Modal */}
       <Modal visible={modalVisible} transparent animationType="fade">
@@ -322,7 +316,12 @@ const RegistrationScreen: React.FC = () => {
                 </Text>
               </View>
             ) : (
-              <SlipButton text="VERIFY" color="#00FF38" onPress={handleVerify} />
+              <SlipButton
+                text="VERIFY"
+                color="#00FF38"
+                onPress={handleVerify}
+                textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+              />
             )}
           </View>
         </View>

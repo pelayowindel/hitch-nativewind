@@ -1,22 +1,16 @@
 import { View, Text, TextInput, Pressable, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFonts } from "expo-font";
 import { useState, useRef } from "react";
 import { useRouter } from "expo-router";
 import FloatingLoading from "../../constants/floatingloading";
+import useAppFonts from "../../hooks/useAppFonts";
 
 export default function driverregistration() {
     const [gender, setGender] = useState("male");
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
    
-
-
-    const [fontsLoaded] = useFonts({
-        "PlusJakarta-Regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
-        "PlusJakarta-Medium": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
-        "PlusJakarta-Bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
-    });
+    const fontsLoaded = useAppFonts();
 
     if (!fontsLoaded) {
         return null;

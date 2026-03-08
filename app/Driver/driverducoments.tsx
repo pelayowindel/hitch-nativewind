@@ -1,17 +1,13 @@
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
+import useAppFonts from "../../hooks/useAppFonts";
 
 export default function documentupload() {
   const router = useRouter();
 
-  const [fontsLoaded] = useFonts({
-    "PlusJakarta-Regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "PlusJakarta-Medium": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "PlusJakarta-Bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
-  });
+  const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) return null;
 

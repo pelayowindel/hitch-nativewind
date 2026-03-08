@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import {View, Text, TextInput, TouchableWithoutFeedback, ScrollView, StatusBar, Animated } from "react-native";
+import { View, Text, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
-import { useFonts } from "expo-font";
 import RegisterOverlay from "./RegisterOverlay";
+import FloatingInput from "../components/ui/FloatingInput";
+import SlipButton from "../components/ui/SlipButton";
+import useAppFonts from "../hooks/useAppFonts";
 
 export default function LoginScreen() {
   const [remember, setRemember] = useState(false);
@@ -11,11 +13,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    "PlusJakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "PlusJakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "PlusJakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
-  });
+  const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) {
     return null;
@@ -45,7 +43,11 @@ export default function LoginScreen() {
           >
             Email
           </Text>
-          <FloatingInput value={email} onChangeText={setEmail} />
+          <FloatingInput
+            value={email}
+            onChangeText={setEmail}
+            inputStyle={{ fontFamily: "PlusJakarta-Regular" }}
+          />
 
           {/* Password */}
           <Text
@@ -58,6 +60,7 @@ export default function LoginScreen() {
             value={password}
             onChangeText={setPassword}
             secure
+            inputStyle={{ fontFamily: "PlusJakarta-Regular" }}
           />
 
           {/* Remember */}
@@ -85,7 +88,17 @@ export default function LoginScreen() {
           </View>
 
           {/* Buttons */}
-          <BrutalButton text="LOG IN" small />
+          <SlipButton
+            text="LOG IN"
+            color="#FF8C00"
+            widthClassName="w-[66%]"
+            containerClassName="items-center mb-4"
+            buttonClassName="py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
+            shadowClassName="absolute bg-black rounded-2xl"
+            shadowStyle={{ top: 3, left: 3 }}
+            textClassName="text-black"
+            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+          />
 
           <View className="flex-row items-center my-6">
             <View className="flex-1 h-[1px] bg-black" />
@@ -98,12 +111,26 @@ export default function LoginScreen() {
             <View className="flex-1 h-[1px] bg-black" />
           </View>
 
-          <BrutalButton
+          <SlipButton
             text="Continue With Google"
+            color="#FF8C00"
             icon={<AntDesign name="google" size={16} color="black" />}
+            buttonClassName="py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
+            shadowClassName="absolute bg-black rounded-2xl"
+            shadowStyle={{ top: 3, left: 3 }}
+            textClassName="text-black"
+            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
           />
 
-          <BrutalButton text="Continue With Apple" />
+          <SlipButton
+            text="Continue With Apple"
+            color="#FF8C00"
+            buttonClassName="py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
+            shadowClassName="absolute bg-black rounded-2xl"
+            shadowStyle={{ top: 3, left: 3 }}
+            textClassName="text-black"
+            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+          />
 
           {/* Register */}
           <View className="flex-row justify-center mt-6">
@@ -130,131 +157,6 @@ export default function LoginScreen() {
       </ScrollView>
     </SafeAreaView>
     
-  );
-}
-
-/* =========================================
-   FLOATING INPUT (Tiny Slip Shadow)
-========================================= */
-
-function FloatingInput({
-  value,
-  onChangeText,
-  secure = false,
-}: {
-  value: string;
-  onChangeText: (text: string) => void;
-  secure?: boolean;
-}) {
-  const lift = useState(new Animated.Value(0))[0];
-
-  const handleFocus = () => {
-    Animated.timing(lift, {
-      toValue: -2,
-      duration: 120,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handleBlur = () => {
-    Animated.timing(lift, {
-      toValue: 0,
-      duration: 120,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  return (
-    <View className="relative mb-6">
-      <View
-        className="absolute bg-black rounded-2xl"
-        style={{
-          width: "100%",
-          height: "100%",
-          top: 3,
-          left: 3,
-          opacity: 10, 
-        }}
-      />
-
-      <Animated.View
-        style={{
-          transform: [{ translateY: lift }],
-        }}
-      >
-        <View className="bg-white rounded-2xl border-2 border-black px-4 py-3">
-          <TextInput
-            value={value}
-            onChangeText={onChangeText}
-            secureTextEntry={secure}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            className="text-black"
-            style={{ fontFamily: "PlusJakarta-Regular" }}
-          />
-        </View>
-      </Animated.View>
-    </View>
-  );
-}
-
-/* =========================================
-   BUTTON (Slip Shadow + Font)
-========================================= */
-
-function BrutalButton({
-  text,
-  icon,
-  small = false,
-}: {
-  text: string;
-  icon?: React.ReactNode;
-  small?: boolean;
-}) {
-  const [pressed, setPressed] = useState(false);
-  const widthStyle = small ? "66%" : "100%";
-
-  return (
-    <TouchableWithoutFeedback
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-    >
-      <View className="items-center mb-4">
-        <View style={{ width: widthStyle }} className="relative">
-
-          {!pressed && (
-            <View
-              className="absolute bg-black rounded-2xl"
-              style={{
-                width: "100%",
-                height: "100%",
-                top: 3,
-                left: 3,
-                opacity: 10,
-              }}
-            />
-          )}
-
-          <View
-            className="bg-[#FF8C00] py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
-            style={{
-              transform: pressed
-                ? [{ translateX: 2 }, { translateY: 2 }]
-                : [],
-            }}
-          >
-            {icon && <View className="mr-2">{icon}</View>}
-            <Text
-              className="text-black"
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-            >
-              {text}
-            </Text>
-          </View>
-
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
   );
 }
 
