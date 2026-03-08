@@ -1,23 +1,81 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, StatusBar } from "react-native";
+import { View, Text, ScrollView, StatusBar, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
+import { Href, useRouter } from "expo-router";
 import RegisterOverlay from "./RegisterOverlay";
 import FloatingInput from "../components/ui/FloatingInput";
 import SlipButton from "../components/ui/SlipButton";
 import useAppFonts from "../hooks/useAppFonts";
+import { supabase } from "../lib/supabase";
+import { AppRole } from "../contexts/SupabaseContext";
 
 export default function LoginScreen() {
   const [remember, setRemember] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const router = useRouter();
 
   const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) {
     return null;
   }
+
+  const getRouteForRole = (role: AppRole): Href => {
+    if (role === "driver") return "/Driver/(tabs)/driver-dashboard";
+    if (role === "admin") return "/Admin/(tabs)";
+    return "/Rider/(tabs)/rider-dashboard";
+  };
+
+  const handleLogin = async () => {
+    if (isLoggingIn) return;
+
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Missing credentials", "Enter your email and password.");
+      return;
+    }
+
+    try {
+      setIsLoggingIn(true);
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        Alert.alert("Login failed", error.message);
+        return;
+      }
+
+      const userId = data.user?.id;
+      if (!userId) {
+        Alert.alert("Login failed", "No user session returned.");
+        return;
+      }
+
+      const { data: roleRow, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .single();
+
+      if (roleError) {
+        Alert.alert("Role error", "Logged in, but could not load your role.");
+        return;
+      }
+
+      const role = (roleRow?.role ?? "rider") as AppRole;
+      router.replace(getRouteForRole(role));
+    } catch (_error) {
+      Alert.alert("Network error", "Could not log in right now. Please try again.");
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-[#E8E8E8]">
@@ -89,7 +147,7 @@ export default function LoginScreen() {
 
           {/* Buttons */}
           <SlipButton
-            text="LOG IN"
+            text={isLoggingIn ? "LOGGING IN..." : "LOG IN"}
             color="#FF8C00"
             widthClassName="w-[66%]"
             containerClassName="items-center mb-4"
@@ -98,6 +156,7 @@ export default function LoginScreen() {
             shadowStyle={{ top: 3, left: 3 }}
             textClassName="text-black"
             textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+            onPress={isLoggingIn ? undefined : handleLogin}
           />
 
           <View className="flex-row items-center my-6">
