@@ -258,7 +258,7 @@ export default function AdminDashboard() {
           title="Verify Drivers"
           subtitle="Review documents for 12 applicants"
           icon={<FontAwesome5 name="id-card" size={18} color="black" />}
-          onPress={() => router.push("/Admin/review")}
+          onPress={() => router.push("/Admin/applicants")}
         />
 
         <CommandButton
@@ -288,7 +288,7 @@ export default function AdminDashboard() {
         <View className="flex-row justify-between items-center mt-6 mb-2">
           <AppText weight="bold" style={{ color: "black" }}>PENDING VERIFICATION</AppText>
 
-          <TouchableOpacity onPress={() => router.push("/Admin/review")}>
+          <TouchableOpacity onPress={() => router.push("/Admin/applicants")}>
             <AppText weight="bold" style={{ fontSize: 12, color: "#2563EB" }}>View All (12)</AppText>
           </TouchableOpacity>
         </View>

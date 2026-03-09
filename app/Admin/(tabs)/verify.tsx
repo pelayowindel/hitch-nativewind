@@ -1,108 +1,114 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView, Alert } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 
-export default function VerifyApplicant() {
-  const handleReject = () => {
-    Alert.alert("Rejected", "You pressed the Reject button.");
-  };
-
-  const handleApprove = () => {
-    Alert.alert("Approved", "You pressed the Approved Driver button.");
-  };
-
+const InfoBox = ({ label, value }: { label: string; value: string }) => {
   return (
-    <ScrollView className="flex-1 bg-gray-800 p-4" contentContainerStyle={{ paddingBottom: 24 }}>
+    <View className="border border-gray-400 rounded-md p-2 flex-1 m-1">
+      <Text className="text-[10px] text-gray-500">{label}</Text>
+      <Text className="text-blue-600 font-semibold mt-1">{value}</Text>
+    </View>
+  );
+};
+
+const UploadBox = ({ label, image }: { label: string; image?: string }) => {
+  return (
+    <View className="flex-1 m-1">
+      <View className="border border-gray-400 rounded-md h-24 items-center justify-center bg-white">
+        {image ? (
+          <Image
+            source={{ uri: image }}
+            className="w-16 h-16"
+            resizeMode="contain"
+          />
+        ) : (
+          <Text className="text-xs text-gray-500">{label}</Text>
+        )}
+      </View>
+      <Text className="text-xs text-center mt-1">{label}</Text>
+    </View>
+  );
+};
+
+export default function DriverVerification() {
+  return (
+    <View className="flex-1 bg-gray-200 p-3">
+
+      {/* Upper-right X Button */}
+      <View className="absolute top-3 right-3 w-6 h-6 border border-black rounded-sm items-center justify-center bg-white">
+        <Text className="text-xs font-bold">X</Text>
+      </View>
+
       {/* Header */}
-      <View className="flex-row items-center justify-between mb-6">
-        <View className="flex-row items-center space-x-2">
-          <View className="w-10 h-10 bg-white rounded-full justify-center items-center">
-            {/* ID Icon Placeholder */}
-            <Text className="text-black font-extrabold text-lg">ID</Text>
-          </View>
-          <Text className="text-white font-extrabold text-xl uppercase">JOHN DOE</Text>
+      <View className="flex-row items-center mb-3 mt-4">
+
+        {/* Driver Image */}
+        <View className="w-14 h-14 border border-gray-400 rounded-md items-center justify-center bg-white mr-3">
+          <Image
+            source={{ uri: "https://via.placeholder.com/60" }}
+            className="w-12 h-12 rounded-sm"
+          />
         </View>
-        <TouchableOpacity className="border border-gray-600 rounded px-2 py-1">
-          <Text className="text-gray-400 text-xl font-semibold">×</Text>
-        </TouchableOpacity>
+
+        {/* Applicant Info */}
+        <View>
+          <Text className="text-xs text-gray-500">VERIFYING APPLICANT</Text>
+          <Text className="text-lg font-bold">JOHN DOE</Text>
+        </View>
+
       </View>
 
-      {/* Driver License No */}
-      <View className="border border-gray-600 rounded-md bg-gray-700 p-3 mb-3">
-        <Text className="text-gray-400 uppercase font-semibold text-xs">DRIVER LICENSE NO.</Text>
-        <Text className="text-blue-400 font-extrabold text-lg mt-1">N02 - 12345678</Text>
-      </View>
-
-      {/* Date of Birth */}
-      <View className="border border-gray-600 rounded-md bg-gray-700 p-3 mb-3">
-        <Text className="text-gray-400 uppercase font-semibold text-xs">DATE OF BIRTH</Text>
-        <Text className="text-white font-extrabold text-lg mt-1">2003 - 09 - 03</Text>
+      {/* Info Row */}
+      <View className="flex-row">
+        <InfoBox label="DRIVER LICENSE NO." value="NO- 12345678" />
+        <InfoBox label="DATE OF BIRTH" value="2003 - 09 - 03" />
       </View>
 
       {/* Address */}
-      <View className="border border-gray-600 rounded-md bg-gray-700 p-3 mb-6">
-        <Text className="text-gray-400 uppercase font-semibold text-xs">ADDRESS</Text>
-        <Text className="text-white font-extrabold text-sm mt-1">
-          RANDOM PLACE, BOGO CITY , CEBU
+      <View className="border border-gray-400 rounded-md p-2 m-1">
+        <Text className="text-[10px] text-gray-500">ADDRESS</Text>
+        <Text className="font-semibold mt-1">
+          RANDOM PLACE, BOGO CITY, CEBU
         </Text>
       </View>
 
-      {/* License (front and back) */}
-      <View className="flex-row space-x-3 mb-4">
-        {/* Front */}
-        <View className="flex-1 border border-gray-600 rounded-md bg-gray-700 p-1">
-          <Image
-            source={{ uri: "https://via.placeholder.com/150x90.png?text=License+Front" }}
-            className="w-full h-24 rounded-md"
-            resizeMode="contain"
-          />
-          <Text className="text-gray-400 text-xs mt-1 text-center">LICENSE (FRONT)</Text>
-        </View>
-
-        {/* Back */}
-        <View className="flex-1 border border-gray-600 rounded-md bg-gray-700 p-1">
-          <Image
-            source={{ uri: "https://via.placeholder.com/150x90.png?text=License+Back" }}
-            className="w-full h-24 rounded-md"
-            resizeMode="contain"
-          />
-          <Text className="text-gray-400 text-xs mt-1 text-center">LICENSE (BACK)</Text>
-        </View>
+      {/* Upload Section */}
+      <View className="flex-row">
+        <UploadBox label="LICENSE (FRONT)" image="https://via.placeholder.com/80" />
+        <UploadBox label="LICENSE (BACK)" />
       </View>
 
-      {/* OR/CR and NBI Clearance placeholders */}
-      <View className="flex-row space-x-3 mb-6">
-        <View className="flex-1 border border-gray-600 rounded-md bg-gray-700 h-24" />
-        <View className="flex-1 border border-gray-600 rounded-md bg-gray-700 h-24" />
+      <View className="flex-row">
+        <UploadBox label="OR / CR" />
+        <UploadBox label="NBI CLEARANCE" />
       </View>
 
       {/* Background Check */}
-      <View className="flex-row items-center border border-gray-600 rounded-md bg-gray-700 p-3 mb-6">
-        <View className="bg-green-600 rounded-full w-5 h-5 justify-center items-center mr-3">
-          <Text className="text-white font-bold text-xs">✓</Text>
+      <View className="border border-gray-400 rounded-md p-3 m-1 flex-row justify-between items-center bg-white">
+        <View className="flex-row items-center">
+          <Text className="text-green-600 mr-2">✔</Text>
+          <View>
+            <Text className="font-semibold">BACKGROUND CHECK</Text>
+            <Text className="text-xs text-gray-500">
+              No criminal record found
+            </Text>
+          </View>
         </View>
-        <Text className="flex-1 text-gray-400 text-xs font-semibold">
-          BACKGROUND CHECK <Text className="text-xs">(no criminal record found)</Text>
-        </Text>
-        <Text className="text-green-500 font-extrabold text-xs">PASSED</Text>
+        <Text className="text-green-600 font-bold">PASSED</Text>
       </View>
 
       {/* Buttons */}
-      <View className="flex-row space-x-3">
-        <TouchableOpacity
-          onPress={handleReject}
-          className="flex-1 bg-red-600 rounded-md py-3 justify-center items-center"
-          activeOpacity={0.8}
-        >
-          <Text className="text-white font-extrabold uppercase text-base">REJECT</Text>
+      <View className="flex-row mt-3">
+        <TouchableOpacity className="flex-1 bg-red-500 py-3 rounded-md mr-1">
+          <Text className="text-center text-white font-bold">REJECT</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleApprove}
-          className="flex-1 bg-blue-600 rounded-md py-3 justify-center items-center"
-          activeOpacity={0.8}
-        >
-          <Text className="text-white font-extrabold uppercase text-base">APPROVED DRIVER</Text>
+
+        <TouchableOpacity className="flex-1 bg-blue-600 py-3 rounded-md ml-1">
+          <Text className="text-center text-white font-bold">
+            APPROVED DRIVER
+          </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+
+    </View>
   );
 }
