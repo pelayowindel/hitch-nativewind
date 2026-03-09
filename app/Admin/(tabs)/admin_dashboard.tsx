@@ -125,7 +125,7 @@ const CommandButton = ({
 /* =============================
    PENDING CARD
 ============================ */
-const PendingCard = () => (
+const PendingCard = ({ router }: { router: any }) => (
   <SlipCard styleClass="mb-3">
     <View className="p-3">
       <View className="flex-row justify-between items-center mb-2">
@@ -151,7 +151,10 @@ const PendingCard = () => (
             className="absolute bg-black rounded-lg"
             style={{ width: "100%", height: "100%", top: 3, left: 3 }}
           />
-          <TouchableOpacity className="flex-1 bg-white border-[2px] border-black rounded-lg py-2 items-center">
+          <TouchableOpacity 
+            onPress={() => router.push("/Admin/verify")}
+            className="flex-1 bg-white border-[2px] border-black rounded-lg py-2 items-center"
+          >
             <AppText weight="bold" style={{ color: "black" }}>Review</AppText>
           </TouchableOpacity>
         </View>
@@ -293,8 +296,8 @@ export default function AdminDashboard() {
           </TouchableOpacity>
         </View>
 
-        <PendingCard />
-        <PendingCard />
+        <PendingCard router={router} />
+        <PendingCard router={router} />
 
       </ScrollView>
 
