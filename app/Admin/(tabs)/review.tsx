@@ -1,7 +1,34 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { Text as RNText } from "react-native";
+
+/* =============================
+   FONT TEXT
+============================ */
+function AppText({
+  children,
+  weight = "regular",
+  style,
+}: {
+  children: React.ReactNode;
+  weight?: "regular" | "medium" | "semibold" | "bold";
+  style?: any;
+}) {
+  const fontMap = {
+    regular: "PlusJakartaRegular",
+    medium: "PlusJakartaMedium",
+    semibold: "PlusJakartaSemiBold",
+    bold: "PlusJakartaBold",
+  };
+
+  return (
+    <RNText style={[{ fontFamily: fontMap[weight] }, style]}>
+      {children}
+    </RNText>
+  );
+}
 
 export default function ApplicantsScreen() {
   const router = useRouter();
@@ -26,9 +53,12 @@ export default function ApplicantsScreen() {
           <Ionicons name="arrow-back" size={20} color="black" />
         </TouchableOpacity>
 
-        <Text className="flex-1 text-center text-lg font-semibold tracking-wide">
+        <AppText
+          weight="semibold"
+          style={{ flex: 1, textAlign: "center", fontSize: 18, letterSpacing: 0.5 }}
+        >
           APPLICANTS
-        </Text>
+        </AppText>
 
         <View className="w-8" />
       </View>
@@ -57,8 +87,12 @@ export default function ApplicantsScreen() {
 
             {/* NAME + SUBTEXT */}
             <View className="flex-1 ml-3">
-              <Text className="font-semibold text-sm">{item.name}</Text>
-              <Text className="text-[11px] text-blue-700">Review Documents</Text>
+              <AppText weight="semibold" style={{ fontSize: 14 }}>
+                {item.name}
+              </AppText>
+              <AppText weight="regular" style={{ fontSize: 11, color: "#1D4ED8" }}>
+                Review Documents
+              </AppText>
             </View>
 
             {/* Arrow Button */}
