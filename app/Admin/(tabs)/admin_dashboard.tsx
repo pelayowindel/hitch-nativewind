@@ -1,12 +1,12 @@
-import React from "react";
-import { View, ScrollView, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
+import { View, ScrollView, TouchableWithoutFeedback, Image } from "react-native";
 import { FontAwesome5, MaterialIcons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Text as RNText } from "react-native";
 
 /* =============================
    FONT TEXT
-============================ */
+============================= */
 function AppText({
   children,
   weight = "regular",
@@ -31,8 +31,8 @@ function AppText({
 }
 
 /* =============================
-   SLIP CARD (Brutalist Shadow)
-============================ */
+   SLIP CARD
+============================= */
 function SlipCard({
   children,
   styleClass = "",
@@ -52,7 +52,6 @@ function SlipCard({
           left: 4,
         }}
       />
-
       {/* Card */}
       <View className="bg-white border-[3px] border-black rounded-2xl">
         {children}
@@ -63,7 +62,7 @@ function SlipCard({
 
 /* =============================
    STAT CARD
-============================ */
+============================= */
 const StatCard = ({
   title,
   value,
@@ -84,7 +83,10 @@ const StatCard = ({
       <AppText weight="bold" style={{ fontSize: 24, marginTop: 8 }}>
         {value}
       </AppText>
-      <AppText weight="regular" style={{ fontSize: 12, marginTop: 4, color: "black" }}>
+      <AppText
+        weight="regular"
+        style={{ fontSize: 12, marginTop: 4, color: "black" }}
+      >
         {subtitle}
       </AppText>
     </View>
@@ -92,39 +94,80 @@ const StatCard = ({
 );
 
 /* =============================
-   COMMAND BUTTON
-============================ */
+   COMMAND BUTTON (BrutalButton Style)
+============================= */
 const CommandButton = ({
   title,
   subtitle,
   icon,
   onPress,
+  styleClass = "",
+  hideArrow = false,
+  centerContent = false,
 }: {
   title: string;
   subtitle?: string;
   icon: React.ReactNode;
   onPress?: () => void;
-}) => (
-  <SlipCard styleClass="mb-3">
-    <TouchableOpacity
+  styleClass?: string;
+  hideArrow?: boolean;
+  centerContent?: boolean;
+}) => {
+  const [pressed, setPressed] = useState(false);
+
+  return (
+    <TouchableWithoutFeedback
       onPress={onPress}
-      className="flex-row items-center justify-between p-3"
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
     >
-      <View className="flex-row items-center">
-        <View className="mr-3">{icon}</View>
-        <View>
-          <AppText weight="bold" style={{ color: "black" }}>{title}</AppText>
-          {subtitle && <AppText style={{ fontSize: 12, color: "black" }}>{subtitle}</AppText>}
+      <View className={`mb-4 ${styleClass}`}>
+        <View className="relative">
+          {!pressed && (
+            <View
+              className="absolute bg-black rounded-2xl"
+              style={{
+                width: "100%",
+                height: "100%",
+                top: 4,
+                left: 4,
+              }}
+            />
+          )}
+          <View
+            className={`bg-white border-[3px] border-black rounded-2xl p-3 flex-row items-center ${
+              centerContent ? "justify-center" : "justify-between"
+            }`}
+            style={{
+              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
+            }}
+          >
+            <View className="flex-row items-center">
+              <View className="mr-3">{icon}</View>
+              <View>
+                <AppText weight="bold" style={{ color: "black" }}>
+                  {title}
+                </AppText>
+                {subtitle && (
+                  <AppText style={{ fontSize: 12, color: "black" }}>
+                    {subtitle}
+                  </AppText>
+                )}
+              </View>
+            </View>
+            {!hideArrow && !centerContent && (
+              <Feather name="arrow-right" size={20} color="black" />
+            )}
+          </View>
         </View>
       </View>
-      <Feather name="arrow-right" size={20} color="black" />
-    </TouchableOpacity>
-  </SlipCard>
-);
+    </TouchableWithoutFeedback>
+  );
+};
 
 /* =============================
    PENDING CARD
-============================ */
+============================= */
 const PendingCard = ({ router }: { router: any }) => (
   <SlipCard styleClass="mb-3">
     <View className="p-3">
@@ -135,39 +178,33 @@ const PendingCard = ({ router }: { router: any }) => (
             style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
           />
           <View>
-            <AppText weight="bold" style={{ color: "black" }}>John Doe</AppText>
-            <AppText style={{ fontSize: 12, color: "black" }}>Submitted 2 days ago</AppText>
+            <AppText weight="bold" style={{ color: "black" }}>
+              John Doe
+            </AppText>
+            <AppText style={{ fontSize: 12, color: "black" }}>
+              Submitted 2 days ago
+            </AppText>
           </View>
         </View>
 
         <View className="bg-orange-400 px-2 py-1 rounded">
-          <AppText weight="bold" style={{ fontSize: 12, color: "white" }}>PENDING</AppText>
+          <AppText weight="bold" style={{ fontSize: 12, color: "white" }}>
+            PENDING
+          </AppText>
         </View>
       </View>
 
       <View className="flex-row gap-x-3">
-        <View className="flex-1 relative">
-          <View
-            className="absolute bg-black rounded-lg"
-            style={{ width: "100%", height: "100%", top: 3, left: 3 }}
-          />
-          <TouchableOpacity 
-            onPress={() => router.push("/Admin/verify")}
-            className="flex-1 bg-white border-[2px] border-black rounded-lg py-2 items-center"
-          >
-            <AppText weight="bold" style={{ color: "black" }}>Review</AppText>
-          </TouchableOpacity>
-        </View>
-
-        <View className="flex-1 relative">
-          <View
-            className="absolute bg-black rounded-lg"
-            style={{ width: "100%", height: "100%", top: 3, left: 3 }}
-          />
-          <TouchableOpacity className="flex-1 bg-white border-[2px] border-black rounded-lg py-2 items-center">
-            <AppText weight="bold" style={{ color: "black" }}>Approve</AppText>
-          </TouchableOpacity>
-        </View>
+        <CommandButton
+          title="Review"
+          icon={<Feather name="eye" size={16} color="black" />}
+          styleClass="flex-1"
+        />
+        <CommandButton
+          title="Approve"
+          icon={<Feather name="check" size={16} color="black" />}
+          styleClass="flex-1"
+        />
       </View>
     </View>
   </SlipCard>
@@ -175,43 +212,48 @@ const PendingCard = ({ router }: { router: any }) => (
 
 /* =============================
    MAIN ADMIN DASHBOARD
-============================ */
+============================= */
 export default function AdminDashboard() {
   const router = useRouter();
 
   return (
     <View className="flex-1 bg-white">
       <ScrollView className="p-4">
-
         {/* Header */}
         <View className="flex-row justify-between items-center mb-4 border-b border-black pb-2">
           <View className="flex-row items-center">
             <Image
               source={{
-                uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                uri:
+                  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
               }}
               style={{ width: 28, height: 28, marginRight: 8 }}
             />
             <AppText weight="bold" style={{ fontSize: 18, color: "black" }}>
-              ADMIN <AppText weight="bold" style={{ color: "#2563EB" }}>CONSOLE</AppText>
+              ADMIN{" "}
+              <AppText weight="bold" style={{ color: "#2563EB" }}>
+                CONSOLE
+              </AppText>
             </AppText>
           </View>
 
-          <View className="flex-row space-x-3">
-            <TouchableOpacity className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
+          {/* Increased spacing between icons */}
+          <View className="flex-row space-x-10">
+            <View className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
               <Feather name="bell" size={20} color="black" />
-            </TouchableOpacity>
-
-            <TouchableOpacity className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
+            </View>
+            <View className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
               <Feather name="user" size={20} color="black" />
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
 
         {/* Status */}
         <View className="flex-row items-center mb-4">
           <View className="w-2 h-2 bg-green-600 rounded-full mr-2" />
-          <AppText weight="bold" style={{ fontSize: 12, color: "black" }}>SYSTEM OPERATIONAL</AppText>
+          <AppText weight="bold" style={{ fontSize: 12, color: "black" }}>
+            SYSTEM OPERATIONAL
+          </AppText>
         </View>
 
         {/* Stats */}
@@ -244,18 +286,27 @@ export default function AdminDashboard() {
 
         {/* Map */}
         <SlipCard styleClass="mt-5">
-          <TouchableOpacity className="h-40 bg-gray-200 rounded-2xl border-black border relative items-center justify-center">
+          <View className="h-40 bg-gray-200 rounded-2xl border-black border relative items-center justify-center">
             <View className="absolute top-2 left-2 bg-blue-600 px-3 py-1 rounded">
-              <AppText weight="bold" style={{ fontSize: 12, color: "white" }}>LIVE GPS VIEW</AppText>
+              <AppText weight="bold" style={{ fontSize: 12, color: "white" }}>
+                LIVE GPS VIEW
+              </AppText>
             </View>
 
             <Feather name="map" size={32} color="black" />
-            <AppText weight="bold" style={{ color: "black", marginTop: 8 }}>MAP AREA</AppText>
-          </TouchableOpacity>
+            <AppText weight="bold" style={{ color: "black", marginTop: 8 }}>
+              MAP AREA
+            </AppText>
+          </View>
         </SlipCard>
 
         {/* Command Center */}
-        <AppText weight="bold" style={{ marginTop: 24, marginBottom: 8, color: "black" }}>COMMAND CENTER</AppText>
+        <AppText
+          weight="bold"
+          style={{ marginTop: 24, marginBottom: 8, color: "black" }}
+        >
+          COMMAND CENTER
+        </AppText>
 
         <CommandButton
           title="Verify Drivers"
@@ -263,7 +314,6 @@ export default function AdminDashboard() {
           icon={<FontAwesome5 name="id-card" size={18} color="black" />}
           onPress={() => router.push("/Admin/applicants")}
         />
-
         <CommandButton
           title="User Management"
           subtitle="Manage riders and drivers profile"
@@ -272,33 +322,40 @@ export default function AdminDashboard() {
 
         {/* Disputes + Broadcast */}
         <View className="flex-row justify-between mt-2">
-          <SlipCard styleClass="w-[48%]">
-            <TouchableOpacity className="items-center py-4">
-              <MaterialIcons name="gavel" size={20} color="black" />
-              <AppText weight="bold" style={{ marginTop: 8, color: "black" }}>Disputes</AppText>
-            </TouchableOpacity>
-          </SlipCard>
-
-          <SlipCard styleClass="w-[48%]">
-            <TouchableOpacity className="items-center py-4">
-              <Feather name="volume-2" size={20} color="black" />
-              <AppText weight="bold" style={{ marginTop: 8, color: "black" }}>Broadcast</AppText>
-            </TouchableOpacity>
-          </SlipCard>
+          <CommandButton
+            title="Disputes"
+            icon={<MaterialIcons name="gavel" size={20} color="black" />}
+            styleClass="w-[48%]"
+            hideArrow={true}
+            centerContent={true}
+          />
+          <CommandButton
+            title="Broadcast"
+            icon={<Feather name="volume-2" size={20} color="black" />}
+            styleClass="w-[48%]"
+            hideArrow={true}
+            centerContent={true}
+          />
         </View>
 
-        {/* Pending Verification */}
+        {/* Pending Verification Header */}
         <View className="flex-row justify-between items-center mt-6 mb-2">
-          <AppText weight="bold" style={{ color: "black" }}>PENDING VERIFICATION</AppText>
+          <AppText weight="bold" style={{ color: "black" }}>
+            PENDING VERIFICATION
+          </AppText>
 
-          <TouchableOpacity onPress={() => router.push("/Admin/applicants")}>
-            <AppText weight="bold" style={{ fontSize: 12, color: "#2563EB" }}>View All (12)</AppText>
-          </TouchableOpacity>
+          <TouchableWithoutFeedback onPress={() => router.push("/Admin/applicants")}>
+            <View className="px-2 py-1 bg-blue-600 rounded">
+              <AppText weight="bold" style={{ color: "white", fontSize: 12 }}>
+                View All
+              </AppText>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
 
+        {/* Pending Cards */}
         <PendingCard router={router} />
         <PendingCard router={router} />
-
       </ScrollView>
 
       {/* Bottom Navigation */}
