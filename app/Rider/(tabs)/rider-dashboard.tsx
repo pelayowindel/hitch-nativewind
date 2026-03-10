@@ -104,7 +104,7 @@ export default function RiderDashboardScreen() {
 
         {/* Request Ride Button */}
         <Pressable
-          onPress={() => router.push('/Rider/ride-request' as Href)}
+          onPress={() => router.push('/Rider/search' as Href)}
           className="flex-row items-center justify-center gap-3 rounded-xl border-[3px] border-black bg-black px-6 py-5 shadow-[4px_4px_0_0_#000] active:translate-y-1"
         >
           <Text className="text-lg font-extrabold uppercase tracking-wide text-white">
