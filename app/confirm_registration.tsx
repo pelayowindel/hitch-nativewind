@@ -32,8 +32,7 @@ const RegistrationScreen: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [verificationCode, setVerificationCode] = useState<string>("");
+  // Removed modalVisible and verificationCode state (verification modal is unused)
   const [retryAt, setRetryAt] = useState<number | null>(null);
 
   /* =============================
@@ -45,7 +44,7 @@ const RegistrationScreen: React.FC = () => {
      ANIMATIONS
   ============================= */
   const loadingFloatAnim = useRef(new Animated.Value(0)).current;
-  const modalFloatAnim = useRef(new Animated.Value(0)).current;
+  // Removed modalFloatAnim (verification modal is unused)
 
   const startFloating = (anim: Animated.Value, amplitude = 20, duration = 800) => {
     Animated.loop(
@@ -76,13 +75,7 @@ const RegistrationScreen: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (verifying) {
-      startFloating(modalFloatAnim, 15, 600);
-    } else {
-      modalFloatAnim.setValue(0);
-    }
-  }, [verifying]);
+  // Removed modal animation effect (verification modal is unused)
 
   useEffect(() => {
     if (!retryAt) return;
@@ -152,20 +145,7 @@ const RegistrationScreen: React.FC = () => {
     }
   };
 
-  const handleVerify = () => {
-    setVerifying(true);
-
-    setTimeout(() => {
-      setVerifying(false);
-
-      if (verificationCode === "123456") {
-        setModalVisible(false);
-        router.push("/user_registration");
-      } else {
-        alert("Invalid verification code");
-      }
-    }, 1500);
-  };
+  // Removed handleVerify (verification modal is unused)
 
   /* =============================
      RENDER LOADING SCREEN
@@ -277,56 +257,7 @@ const RegistrationScreen: React.FC = () => {
         onPress={registering || (retryAt !== null && retryAt > Date.now()) ? undefined : handleRegister}
       />
 
-      {/* Verification Modal */}
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View className="flex-1 bg-black/50 justify-center items-center px-6">
-          <View className="bg-white border-2 border-black rounded-md p-6 w-full relative">
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}
-            >
-              <Ionicons name="close" size={24} color="black" />
-            </TouchableOpacity>
-
-            <Text
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-              className="text-center mb-4 text-lg"
-            >
-              ENTER VERIFICATION CODE
-            </Text>
-
-            <TextInput
-              value={verificationCode}
-              onChangeText={setVerificationCode}
-              placeholder="Enter 6-digit code"
-              keyboardType="numeric"
-              className="border-2 border-black rounded-md px-4 py-3 mb-6"
-              style={{ fontFamily: "PlusJakarta-Regular" }}
-            />
-
-            {verifying ? (
-              <View className="flex-row justify-center items-center">
-                <Animated.View style={{ transform: [{ translateY: modalFloatAnim }] }}>
-                  <MaterialCommunityIcons name="motorbike" size={48} color="#000000" />
-                </Animated.View>
-                <Text
-                  style={{ fontFamily: "PlusJakarta-Bold" }}
-                  className="ml-4 text-black"
-                >
-                  Verifying...
-                </Text>
-              </View>
-            ) : (
-              <SlipButton
-                text="VERIFY"
-                color="#00FF38"
-                onPress={handleVerify}
-                textStyle={{ fontFamily: "PlusJakarta-Bold" }}
-              />
-            )}
-          </View>
-        </View>
-      </Modal>
+      {/* Verification Modal removed: modal was unreachable and unused */}
     </SafeAreaView>
   );
 };

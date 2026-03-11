@@ -54,7 +54,7 @@ export default function DriverRegistration() {
         try {
             setLoading(true);
 
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email: email.trim(),
                 password,
                 options: {
@@ -81,6 +81,20 @@ export default function DriverRegistration() {
 
                 Alert.alert("Signup failed", error.message);
                 return;
+            }
+
+            // Insert role into user_roles table for role-based navigation
+            const userId = data?.user?.id;
+            if (userId) {
+                const { error: roleError } = await supabase
+                    .from("user_roles")
+                    .insert({ user_id: userId, role: "driver" });
+                if (roleError) {
+                    Alert.alert(
+                        "Role assignment failed",
+                        "Account created, but could not assign driver role. Please contact support."
+                    );
+                }
             }
 
             Alert.alert("Account created", "Now continue with your driver details.", [
