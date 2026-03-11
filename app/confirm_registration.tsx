@@ -8,6 +8,7 @@ import {
   Modal,
   Animated,
   Easing,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -98,17 +99,17 @@ const RegistrationScreen: React.FC = () => {
 
     if (isCoolingDown) {
       const secondsLeft = Math.ceil((retryAt - Date.now()) / 1000);
-      alert(`Too many attempts. Please wait ${secondsLeft}s before trying again.`);
+      Alert.alert("Too many attempts", `Please wait ${secondsLeft}s before trying again.`);
       return;
     }
 
     if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
-      alert("Email, password, and confirm password are required");
+      Alert.alert("Missing fields", "Email, password, and confirm password are required");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      Alert.alert("Password mismatch", "Passwords do not match");
       return;
     }
 
@@ -128,24 +129,22 @@ const RegistrationScreen: React.FC = () => {
 
         if (isRateLimited) {
           setRetryAt(Date.now() + SIGNUP_RETRY_COOLDOWN_MS);
-          alert("Email send limit reached. Please wait about 60 seconds, then try again.");
+          Alert.alert("Email send limit reached", "Please wait about 60 seconds, then try again.");
           return;
         }
 
-        alert(error.message);
+        Alert.alert("Registration failed", error.message);
         return;
       }
 
-      alert("Registration successful. Please log in.");
+      Alert.alert("Registration successful", "Please log in.");
       router.replace("/LogIn");
     } catch (_err) {
-      alert("Unable to register right now. Please try again.");
+      Alert.alert("Unable to register", "Unable to register right now. Please try again.");
     } finally {
       setRegistering(false);
     }
   };
-
-  // Removed handleVerify (verification modal is unused)
 
   /* =============================
      RENDER LOADING SCREEN

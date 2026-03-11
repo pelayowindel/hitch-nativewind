@@ -25,9 +25,9 @@ export default function LoginScreen() {
   }
 
   const getRouteForRole = (role: AppRole): Href => {
-    if (role === "driver") return "/Driver/(tabs)/driver-dashboard";
-    if (role === "admin") return "/Admin/(tabs)";
-    return "/Rider/(tabs)/rider-dashboard";
+    if (role === "driver") return "/Driver/driver-dashboard";
+    if (role === "admin") return "/Admin";
+    return "/Rider/rider-dashboard";
   };
 
   const handleLogin = async () => {

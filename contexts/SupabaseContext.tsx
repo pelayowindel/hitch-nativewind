@@ -81,12 +81,12 @@ export const SupabaseProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (error || !data?.role) {
-        setRole('rider');
+        if (isMounted) setRole('rider');
       } else {
-        setRole(data.role as AppRole);
+        if (isMounted) setRole(data.role as AppRole);
       }
 
-      setIsRoleLoading(false);
+      if (isMounted) setIsRoleLoading(false);
     };
 
     loadRole();
