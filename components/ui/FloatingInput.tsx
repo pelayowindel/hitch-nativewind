@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import {
   Animated,
   TextInput,
@@ -19,7 +19,7 @@ type FloatingInputProps = {
   inputStyle?: StyleProp<TextStyle>;
   shadowClassName?: string;
   shadowStyle?: StyleProp<ViewStyle>;
-  inputProps?: Omit<TextInputProps, "value" | "onChangeText" | "secureTextEntry">;
+  inputProps?: Omit<TextInputProps, "value" | "onChangeText" | "secureTextEntry" | "onFocus" | "onBlur">;
 };
 
 export default function FloatingInput({
@@ -34,7 +34,7 @@ export default function FloatingInput({
   shadowStyle,
   inputProps,
 }: FloatingInputProps) {
-  const lift = useState(new Animated.Value(0))[0];
+  const lift = useRef(new Animated.Value(0)).current;
 
   const handleFocus = () => {
     Animated.timing(lift, {

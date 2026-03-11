@@ -18,9 +18,10 @@ import SlipCard from "../components/ui/SlipCard";
 import SlipButton from "../components/ui/SlipButton";
 import useAppFonts from "../hooks/useAppFonts";
 
+const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
+
 const RegistrationScreen: React.FC = () => {
   const router = useRouter();
-  const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
 
   /* =============================
      STATE
@@ -39,10 +40,6 @@ const RegistrationScreen: React.FC = () => {
      LOAD FONTS
   ============================= */
   const fontsLoaded = useAppFonts();
-
-  if (!fontsLoaded) {
-    return null; // Optional: Add loading indicator
-  }
 
   /* =============================
      ANIMATIONS
@@ -96,6 +93,10 @@ const RegistrationScreen: React.FC = () => {
     return () => clearTimeout(timer);
   }, [retryAt]);
 
+  if (!fontsLoaded) {
+    return null; // Optional: Add loading indicator
+  }
+
   /* =============================
      HANDLERS
   ============================= */
@@ -108,13 +109,13 @@ const RegistrationScreen: React.FC = () => {
       return;
     }
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+      alert("Email, password, and confirm password are required");
       return;
     }
 
-    if (!email.trim() || !password.trim()) {
-      alert("Email and password are required");
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
       return;
     }
 

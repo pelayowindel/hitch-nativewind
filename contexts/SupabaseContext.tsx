@@ -77,6 +77,7 @@ export const SupabaseProvider: React.FC<{ children: React.ReactNode }> = ({
         .single();
 
       if (!isMounted) {
+        setIsRoleLoading(false);
         return;
       }
 

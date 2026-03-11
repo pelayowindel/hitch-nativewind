@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import useAppFonts from "../../hooks/useAppFonts";
 
-export default function driverregistration() {
+export default function DriverRegistration() {
     const [gender, setGender] = useState("male");
     const router = useRouter();
     

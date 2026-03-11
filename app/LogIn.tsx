@@ -64,7 +64,11 @@ export default function LoginScreen() {
         .single();
 
       if (roleError) {
-        Alert.alert("Role error", "Logged in, but could not load your role.");
+        Alert.alert(
+          "Role error",
+          "Logged in, but could not load your role. Continuing as rider."
+        );
+        router.replace(getRouteForRole("rider"));
         return;
       }
 

@@ -6,8 +6,9 @@ import FloatingLoading from "../../constants/floatingloading";
 import useAppFonts from "../../hooks/useAppFonts";
 import { supabase } from "../../lib/supabase";
 
-export default function driverregistration() {
-    const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
+const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
+
+export default function DriverRegistration() {
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
