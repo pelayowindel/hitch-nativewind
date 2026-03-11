@@ -7,14 +7,6 @@ import { useRouter } from "expo-router";
 export default function documentupload() {
   const router = useRouter();
 
- const [fontsLoaded] = useFonts({
-  "PlusJakarta-Regular": require("../../../assets/fonts/PlusJakartaSans-Regular.ttf"),
-  "PlusJakarta-Medium": require("../../../assets/fonts/PlusJakartaSans-Medium.ttf"),
-  "PlusJakarta-Bold": require("../../../assets/fonts/PlusJakartaSans-Bold.ttf"),
-});
-
-  if (!fontsLoaded) return null;
-
   return (
     <SafeAreaView className="flex-1 bg-gray-300">
       <ScrollView className="flex-1 px-4 pt-6">
