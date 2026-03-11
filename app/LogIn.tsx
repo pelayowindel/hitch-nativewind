@@ -160,6 +160,7 @@ export default function LoginScreen() {
             shadowStyle={{ top: 3, left: 3 }}
             textClassName="text-black"
             textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+            disabled={isLoggingIn}
             onPress={isLoggingIn ? undefined : handleLogin}
           />
 
