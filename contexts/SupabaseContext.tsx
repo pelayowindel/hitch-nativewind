@@ -2,9 +2,12 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
+export type AppRole = 'rider' | 'driver' | 'admin';
+
 interface SupabaseContextType {
   session: Session | null;
   user: User | null;
+  role: AppRole | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
 }
@@ -12,6 +15,7 @@ interface SupabaseContextType {
 const SupabaseContext = createContext<SupabaseContextType>({
   session: null,
   user: null,
+  role: null,
   isLoading: true,
   signOut: async () => {},
 });
@@ -29,14 +33,16 @@ export const SupabaseProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState<AppRole | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isRoleLoading, setIsRoleLoading] = useState(false);
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setIsLoading(false);
+      setIsAuthLoading(false);
     });
 
     // Listen for auth changes
@@ -52,12 +58,58 @@ export const SupabaseProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!user) {
+      setRole(null);
+      setIsRoleLoading(false);
+      return;
+    }
+
+    const loadRole = async () => {
+      setIsRoleLoading(true);
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (error || !data?.role) {
+        if (isMounted) setRole('rider');
+      } else {
+        if (isMounted) setRole(data.role as AppRole);
+      }
+
+      if (isMounted) setIsRoleLoading(false);
+    };
+
+    loadRole();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <SupabaseContext.Provider value={{ session, user, isLoading, signOut }}>
+    <SupabaseContext.Provider
+      value={{
+        session,
+        user,
+        role,
+        isLoading: isAuthLoading || isRoleLoading,
+        signOut,
+      }}
+    >
       {children}
     </SupabaseContext.Provider>
   );
