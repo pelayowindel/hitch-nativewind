@@ -29,7 +29,7 @@ export default function documentupload() {
             </View>
 
             <Pressable
-              onPress={() => router.back()}
+              onPress={() => router.push("/Admin/admin_dashboard")}
               className="w-8 h-8 bg-gray-200 rounded border border-black items-center justify-center"
               style={{ borderWidth: 2 }}
             >
@@ -64,7 +64,7 @@ export default function documentupload() {
           <View className="flex-row gap-3 mb-3">
             <View className="flex-1 border border-black rounded-lg overflow-hidden" style={{ borderWidth: 2 }}>
               <Image
-                // source={require("../../../assets/license-front.png")} // replace with your image
+                // source={require("../../../assets/license-front.png")}
                 className="w-full h-28"
                 resizeMode="cover"
               />
@@ -75,7 +75,7 @@ export default function documentupload() {
 
             <View className="flex-1 border border-black rounded-lg overflow-hidden" style={{ borderWidth: 2 }}>
               <Image
-               // source={require("../../../assets/license-back.png")}// replace with your image
+               // source={require("../../../assets/license-back.png")}
                 className="w-full h-28"
                 resizeMode="cover"
               />

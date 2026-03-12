@@ -47,7 +47,7 @@ export default function ApplicantsScreen() {
       {/* HEADER */}
       <View className="flex-row items-center bg-gray-300 px-4 py-4">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.push("/Admin/admin_dashboard")}
           className="p-2 bg-white rounded-lg border border-gray-400"
         >
           <Ionicons name="arrow-back" size={20} color="black" />
@@ -96,7 +96,7 @@ export default function ApplicantsScreen() {
             </View>
 
             {/* Arrow Button */}
-            <TouchableOpacity className="p-2" onPress={() => router.push("/Admin/admin_verification")}
+            <TouchableOpacity className="p-2" //onPress={() => router.push("/Admin/admin_verification")}
               >
               <Ionicons name="chevron-forward" size={22} color="blue" />
             </TouchableOpacity>
