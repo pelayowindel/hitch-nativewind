@@ -1,122 +1,198 @@
-import { View, Text, TextInput, Pressable, Animated } from "react-native";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFonts } from "expo-font";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import FloatingLoading from "../../constants/floatingloading";
+import useAppFonts from "../../hooks/useAppFonts";
+import { supabase } from "../../lib/supabase";
 
-export default function driverregistration() {
-    const [gender, setGender] = useState("male");
-    const router = useRouter();
-    const [loading, setLoading] = useState<boolean>(false);
-   
+const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
 
+export default function DriverRegistration() {
+  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [retryAt, setRetryAt] = useState<number | null>(null);
 
-    const [fontsLoaded] = useFonts({
-        "PlusJakarta-Regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
-        "PlusJakarta-Medium": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
-        "PlusJakarta-Bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
-    });
+  const fontsLoaded = useAppFonts();
 
-    if (!fontsLoaded) {
-        return null;
+  useEffect(() => {
+    if (!retryAt) return;
+
+    const timeoutMs = Math.max(0, retryAt - Date.now());
+    const timer = setTimeout(() => setRetryAt(null), timeoutMs);
+
+    return () => clearTimeout(timer);
+  }, [retryAt]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const handleContinue = async () => {
+    if (loading) return;
+
+    const isCoolingDown = !!retryAt && retryAt > Date.now();
+    if (isCoolingDown) {
+      const secondsLeft = Math.ceil((retryAt - Date.now()) / 1000);
+      Alert.alert("Please wait", `Too many attempts. Try again in ${secondsLeft}s.`);
+      return;
     }
 
-    return (
-        <SafeAreaView className="flex-1 bg-gray-200">
-            <View className="flex-1 px-4 pt-6">
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+      Alert.alert("Missing fields", "Email, password, and confirm password are required.");
+      return;
+    }
 
-                {/* Header */}
-                <View className="flex-row items-center mb-6">
-                    <View className="absolute top-1 left-1 h-full bg-black rounded-lg"
-                        style={{ width: 35 }} />
-                    <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg"
-                        style={{ borderWidth: 2 }}
-                        onPress={() => router.push("/LogIn")}>
-                        <Text className="text-2xl text-center text-black font-bold">←</Text>
-                    </Pressable>
-                    <Text
-                        className="flex-1 text-center text-black text-xl"
-                        style={{ fontFamily: "PlusJakarta-Bold" }}
-                    >
-                        REGISTRATION
-                    </Text>
-                </View>
+    if (password !== confirmPassword) {
+      Alert.alert("Password mismatch", "Password and confirm password must match.");
+      return;
+    }
 
-                {/* Account Credentials */}
-                <View className="flex-1 mt-6">
-                    <Text className="text-xl font-bold mb-1">ACCOUNT DETAILS</Text>
-                    <Text className="text-gray-500 mb-4">
-                        Create your login credentials
-                    </Text>
+    try {
+      setLoading(true);
 
-                    {/* Email */}
-                    <View className="mb-6">
-                        <Text className="mb-1 font-semibold">EMAIL ADDRESS</Text>
-                        <TextInput
-                            className="bg-white border border-black rounded px-4 py-4"
-                            style={{ borderWidth: 2 }}
-                            placeholder="juan06@gmail.com"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    </View>
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            requested_role: "driver",
+          },
+        },
+      });
 
-                    {/* Password */}
-                    <View className="mb-6">
-                        <Text className="mb-1 font-semibold">PASSWORD</Text>
-                        <TextInput
-                            className="bg-white border border-black rounded px-4 py-4"
-                            style={{ borderWidth: 2 }}
-                            placeholder="Enter password"
-                            secureTextEntry
-                        />
-                    </View>
+      if (error) {
+        const isRateLimited =
+          error.status === 429 ||
+          error.code === "over_email_send_rate_limit" ||
+          error.message?.toLowerCase().includes("rate limit");
 
-                    {/* Confirm Password */}
-                    <View className="mb-6">
-                        <Text className="mb-1 font-semibold">CONFIRM PASSWORD</Text>
-                        <TextInput
-                            className="bg-white border border-black rounded px-4 py-4"
-                            style={{ borderWidth: 2 }}
-                            placeholder="Confirm password"
-                            secureTextEntry
-                        />
-                    </View>
-                    {/* Continue Button */}
-                    <View className="relative mt-auto">
-                        {/* Shadow */}
-                        <View
-                            className="absolute rounded-lg"
-                            style={{
-                                top: 5,
-                                left: 4,
-                                width: "100%",
-                                height: "100%",
-                                backgroundColor: "#000",
-                            }}
-                        />
+        if (isRateLimited) {
+          setRetryAt(Date.now() + SIGNUP_RETRY_COOLDOWN_MS);
+          Alert.alert(
+            "Email limit reached",
+            "Please wait about 60 seconds before requesting another signup email."
+          );
+          return;
+        }
 
-                        <Pressable
-                            className="bg-orange-500 py-4 rounded items-center border border-black"
-                            style={{ borderWidth: 2 }}
-                            onPress={() => {
-                                setLoading(true);
+        Alert.alert("Signup failed", error.message);
+        return;
+      }
 
-                                setTimeout(() => {
-                                    setLoading(false);
-                                    router.push("./driverregistration");
-                                }, 1500);
-                            }}
-                        >
-                            <Text className="font-bold text-black">
-                                CONTINUE
-                            </Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </View>
-             <FloatingLoading visible={loading} label="LOADING...." />
-        </SafeAreaView>
-    );
+      // Role is assigned server-side in handle_new_user trigger using requested_role metadata.
+
+      Alert.alert("Account created", "Now continue with your driver details.", [
+        { text: "OK", onPress: () => router.push("/Driver/driverregistration") },
+      ]);
+    } catch (_error) {
+      Alert.alert("Network error", "Could not register right now. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-gray-200">
+      <View className="flex-1 px-4 pt-6">
+
+        {/* Header */}
+        <View className="flex-row items-center mb-6">
+          <View className="absolute top-1 left-1 h-full bg-black rounded-lg"
+            style={{ width: 35 }} />
+          <Pressable className="w-10 h-10 bg-white rounded border border-black shadow-lg"
+            style={{ borderWidth: 2 }}
+            onPress={() => router.push("/LogIn")}>
+            <Text className="text-2xl text-center text-black font-bold">←</Text>
+          </Pressable>
+          <Text
+            className="flex-1 text-center text-black text-xl"
+            style={{ fontFamily: "PlusJakarta-Bold" }}
+          >
+            REGISTRATION
+          </Text>
+        </View>
+
+        {/* Account Credentials */}
+        <View className="flex-1 mt-6">
+          <Text className="text-xl font-bold mb-1">ACCOUNT DETAILS</Text>
+          <Text className="text-gray-500 mb-4">
+            Create your login credentials
+          </Text>
+
+          {/* Email */}
+          <View className="mb-6">
+            <Text className="mb-1 font-semibold">EMAIL ADDRESS</Text>
+            <TextInput
+              className="bg-white border border-black rounded px-4 py-4"
+              style={{ borderWidth: 2 }}
+              placeholder="juan06@gmail.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+
+          {/* Password */}
+          <View className="mb-6">
+            <Text className="mb-1 font-semibold">PASSWORD</Text>
+            <TextInput
+              className="bg-white border border-black rounded px-4 py-4"
+              style={{ borderWidth: 2 }}
+              placeholder="Enter password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          {/* Confirm Password */}
+          <View className="mb-6">
+            <Text className="mb-1 font-semibold">CONFIRM PASSWORD</Text>
+            <TextInput
+              className="bg-white border border-black rounded px-4 py-4"
+              style={{ borderWidth: 2 }}
+              placeholder="Confirm password"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+          </View>
+          {/* Continue Button */}
+          <View className="relative mt-auto">
+            {/* Shadow */}
+            <View
+              className="absolute rounded-lg"
+              style={{
+                top: 5,
+                left: 4,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "#000",
+              }}
+            />
+
+            <Pressable
+              className="bg-orange-500 py-4 rounded items-center border border-black"
+              style={{ borderWidth: 2 }}
+              onPress={loading || (retryAt !== null && retryAt > Date.now()) ? undefined : handleContinue}
+            >
+              <Text className="font-bold text-black">
+                {loading
+                  ? "CREATING ACCOUNT..."
+                  : retryAt && retryAt > Date.now()
+                    ? "PLEASE WAIT"
+                    : "CONTINUE"}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+      <FloatingLoading visible={loading} label="LOADING...." />
+    </SafeAreaView>
+  );
 }

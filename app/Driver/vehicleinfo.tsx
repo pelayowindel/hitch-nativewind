@@ -1,19 +1,15 @@
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFonts } from "expo-font";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import useAppFonts from "../../hooks/useAppFonts";
 
 export default function vehicleinfo() {
     const [motorcycleType, setMotorcycleType] = useState("standard");
     const [selectedColor, setSelectedColor] = useState("");
 
-    const [fontsLoaded] = useFonts({
-        "PlusJakarta-Regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
-        "PlusJakarta-Medium": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
-        "PlusJakarta-Bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
-    });
+    const fontsLoaded = useAppFonts();
 
     type ColorKey = keyof typeof colorMap;
     const colors: ColorKey[] = ["violet", "red", "blue", "black", "gray", "yellow", "green",
@@ -258,7 +254,7 @@ export default function vehicleinfo() {
                     />
                     <Pressable className="bg-orange-500 py-4 rounded items-center border border-black"
                     style={{ borderWidth: 2 }}
-                    onPress={() => router.push("./driverducoments")}
+                    onPress={() => router.push("./driverdocuments")}
                     >
                         <Text className="font-bold text-black">
                             CONTINUED TO DOCUMENTS
