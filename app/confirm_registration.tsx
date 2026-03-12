@@ -177,7 +177,7 @@ const RegistrationScreen: React.FC = () => {
 
       if (verificationCode === "123456") {
         setModalVisible(false);
-        router.push("/user_registration");
+        router.push("./user_registration");
       } else {
         alert("Invalid verification code");
       }

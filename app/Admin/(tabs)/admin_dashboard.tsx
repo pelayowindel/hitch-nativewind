@@ -1,21 +1,24 @@
 import React, { useState } from "react";
-import { View, ScrollView, TouchableWithoutFeedback, Image } from "react-native";
+import {
+  View,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Image,
+  Text as RNText,
+} from "react-native";
 import { FontAwesome5, MaterialIcons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Text as RNText } from "react-native";
 
-/* =============================
-   FONT TEXT
-============================= */
-function AppText({
-  children,
-  weight = "regular",
-  style,
-}: {
+/* ============================================================================
+   APP TEXT (Reusable Typography Component)
+============================================================================ */
+interface AppTextProps {
   children: React.ReactNode;
   weight?: "regular" | "medium" | "semibold" | "bold";
   style?: any;
-}) {
+}
+
+function AppText({ children, weight = "regular", style }: AppTextProps) {
   const fontMap = {
     regular: "PlusJakartaRegular",
     medium: "PlusJakartaMedium",
@@ -23,36 +26,24 @@ function AppText({
     bold: "PlusJakartaBold",
   };
 
-  return (
-    <RNText style={[{ fontFamily: fontMap[weight] }, style]}>
-      {children}
-    </RNText>
-  );
+  return <RNText style={[{ fontFamily: fontMap[weight] }, style]}>{children}</RNText>;
 }
 
-/* =============================
-   SLIP CARD
-============================= */
-function SlipCard({
-  children,
-  styleClass = "",
-}: {
+/* ============================================================================
+   SLIP CARD (Brutalist Shadow Card)
+============================================================================ */
+interface SlipCardProps {
   children: React.ReactNode;
   styleClass?: string;
-}) {
+}
+
+function SlipCard({ children, styleClass = "" }: SlipCardProps) {
   return (
     <View className={`relative ${styleClass}`}>
-      {/* Shadow */}
       <View
         className="absolute bg-black rounded-2xl"
-        style={{
-          width: "100%",
-          height: "100%",
-          top: 4,
-          left: 4,
-        }}
+        style={{ width: "100%", height: "100%", top: 4, left: 4 }}
       />
-      {/* Card */}
       <View className="bg-white border-[3px] border-black rounded-2xl">
         {children}
       </View>
@@ -60,42 +51,49 @@ function SlipCard({
   );
 }
 
-/* =============================
-   STAT CARD
-============================= */
-const StatCard = ({
-  title,
-  value,
-  subtitle,
-  icon,
-}: {
+/* ============================================================================
+   STAT CARD (Dashboard Metric Box)
+============================================================================ */
+interface StatCardProps {
   title: string;
   value: string;
   subtitle: string;
   icon: React.ReactNode;
-}) => (
+}
+
+const StatCard = ({ title, value, subtitle, icon }: StatCardProps) => (
   <SlipCard styleClass="w-[48%] mb-3">
     <View className="p-3 relative">
       <View className="absolute top-2 right-2">{icon}</View>
+
       <AppText weight="semibold" style={{ fontSize: 12, color: "black" }}>
         {title}
       </AppText>
+
       <AppText weight="bold" style={{ fontSize: 24, marginTop: 8 }}>
         {value}
       </AppText>
-      <AppText
-        weight="regular"
-        style={{ fontSize: 12, marginTop: 4, color: "black" }}
-      >
+
+      <AppText style={{ fontSize: 12, marginTop: 4, color: "black" }}>
         {subtitle}
       </AppText>
     </View>
   </SlipCard>
 );
 
-/* =============================
-   COMMAND BUTTON (BrutalButton Style)
-============================= */
+/* ============================================================================
+   COMMAND BUTTON
+============================================================================ */
+interface CommandButtonProps {
+  title: string;
+  subtitle?: string;
+  icon: React.ReactNode;
+  onPress?: () => void;
+  styleClass?: string;
+  hideArrow?: boolean;
+  centerContent?: boolean;
+}
+
 const CommandButton = ({
   title,
   subtitle,
@@ -104,15 +102,7 @@ const CommandButton = ({
   styleClass = "",
   hideArrow = false,
   centerContent = false,
-}: {
-  title: string;
-  subtitle?: string;
-  icon: React.ReactNode;
-  onPress?: () => void;
-  styleClass?: string;
-  hideArrow?: boolean;
-  centerContent?: boolean;
-}) => {
+}: CommandButtonProps) => {
   const [pressed, setPressed] = useState(false);
 
   return (
@@ -126,14 +116,10 @@ const CommandButton = ({
           {!pressed && (
             <View
               className="absolute bg-black rounded-2xl"
-              style={{
-                width: "100%",
-                height: "100%",
-                top: 4,
-                left: 4,
-              }}
+              style={{ width: "100%", height: "100%", top: 4, left: 4 }}
             />
           )}
+
           <View
             className={`bg-white border-[3px] border-black rounded-2xl p-3 flex-row items-center ${
               centerContent ? "justify-center" : "justify-between"
@@ -148,6 +134,7 @@ const CommandButton = ({
                 <AppText weight="bold" style={{ color: "black" }}>
                   {title}
                 </AppText>
+
                 {subtitle && (
                   <AppText style={{ fontSize: 12, color: "black" }}>
                     {subtitle}
@@ -155,6 +142,7 @@ const CommandButton = ({
                 )}
               </View>
             </View>
+
             {!hideArrow && !centerContent && (
               <Feather name="arrow-right" size={20} color="black" />
             )}
@@ -165,12 +153,17 @@ const CommandButton = ({
   );
 };
 
-/* =============================
+/* ============================================================================
    PENDING CARD
-============================= */
-const PendingCard = ({ router }: { router: any }) => (
+============================================================================ */
+interface PendingCardProps {
+  router: any;
+}
+
+const PendingCard = ({ router }: PendingCardProps) => (
   <SlipCard styleClass="mb-3">
     <View className="p-3">
+      {/* Header */}
       <View className="flex-row justify-between items-center mb-2">
         <View className="flex-row items-center">
           <Image
@@ -194,25 +187,29 @@ const PendingCard = ({ router }: { router: any }) => (
         </View>
       </View>
 
+      {/* Buttons */}
       <View className="flex-row gap-x-3">
         <CommandButton
           title="Review"
           icon={<Feather name="eye" size={16} color="black" />}
           styleClass="flex-1"
+          onPress={() => router.push("/Admin/applicants")}
         />
+
         <CommandButton
           title="Approve"
           icon={<Feather name="check" size={16} color="black" />}
           styleClass="flex-1"
+          onPress={() => alert("Approved Successfully!")}
         />
       </View>
     </View>
   </SlipCard>
 );
 
-/* =============================
-   MAIN ADMIN DASHBOARD
-============================= */
+/* ============================================================================
+   MAIN ADMIN DASHBOARD SCREEN
+============================================================================ */
 export default function AdminDashboard() {
   const router = useRouter();
 
@@ -224,20 +221,16 @@ export default function AdminDashboard() {
           <View className="flex-row items-center">
             <Image
               source={{
-                uri:
-                  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
               }}
               style={{ width: 28, height: 28, marginRight: 8 }}
             />
+
             <AppText weight="bold" style={{ fontSize: 18, color: "black" }}>
-              ADMIN{" "}
-              <AppText weight="bold" style={{ color: "#2563EB" }}>
-                CONSOLE
-              </AppText>
+              ADMIN <AppText weight="bold" style={{ color: "#2563EB" }}>CONSOLE</AppText>
             </AppText>
           </View>
 
-          {/* Increased spacing between icons */}
           <View className="flex-row space-x-10">
             <View className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
               <Feather name="bell" size={20} color="black" />
@@ -248,7 +241,7 @@ export default function AdminDashboard() {
           </View>
         </View>
 
-        {/* Status */}
+        {/* System Status */}
         <View className="flex-row items-center mb-4">
           <View className="w-2 h-2 bg-green-600 rounded-full mr-2" />
           <AppText weight="bold" style={{ fontSize: 12, color: "black" }}>
@@ -264,18 +257,21 @@ export default function AdminDashboard() {
             subtitle="+12%"
             icon={<Feather name="bell" size={16} color="black" />}
           />
+
           <StatCard
             title="Active Rides"
             value="342"
             subtitle="+12%"
             icon={<FontAwesome5 name="motorcycle" size={16} color="black" />}
           />
+
           <StatCard
             title="Pending Drivers"
             value="12"
             subtitle="Requires Attention"
             icon={<Feather name="user-check" size={16} color="black" />}
           />
+
           <StatCard
             title="Online Fleet"
             value="85"
@@ -301,10 +297,7 @@ export default function AdminDashboard() {
         </SlipCard>
 
         {/* Command Center */}
-        <AppText
-          weight="bold"
-          style={{ marginTop: 24, marginBottom: 8, color: "black" }}
-        >
+        <AppText weight="bold" style={{ marginTop: 24, marginBottom: 8, color: "black" }}>
           COMMAND CENTER
         </AppText>
 
@@ -314,31 +307,32 @@ export default function AdminDashboard() {
           icon={<FontAwesome5 name="id-card" size={18} color="black" />}
           onPress={() => router.push("/Admin/applicants")}
         />
+
         <CommandButton
           title="User Management"
           subtitle="Manage riders and drivers profile"
           icon={<Feather name="users" size={18} color="black" />}
         />
 
-        {/* Disputes + Broadcast */}
+        {/* Small Commands */}
         <View className="flex-row justify-between mt-2">
           <CommandButton
             title="Disputes"
             icon={<MaterialIcons name="gavel" size={20} color="black" />}
             styleClass="w-[48%]"
-            hideArrow={true}
-            centerContent={true}
+            hideArrow
+            centerContent
           />
           <CommandButton
             title="Broadcast"
             icon={<Feather name="volume-2" size={20} color="black" />}
             styleClass="w-[48%]"
-            hideArrow={true}
-            centerContent={true}
+            hideArrow
+            centerContent
           />
         </View>
 
-        {/* Pending Verification Header */}
+        {/* Pending Header */}
         <View className="flex-row justify-between items-center mt-6 mb-2">
           <AppText weight="bold" style={{ color: "black" }}>
             PENDING VERIFICATION
@@ -346,7 +340,7 @@ export default function AdminDashboard() {
 
           <TouchableWithoutFeedback onPress={() => router.push("/Admin/applicants")}>
             <View className="px-2 py-1 bg-blue-600 rounded">
-              <AppText weight="bold" style={{ color: "white", fontSize: 12 }}>
+              <AppText weight="bold" style={{ fontSize: 12, color: "white" }}>
                 View All
               </AppText>
             </View>
