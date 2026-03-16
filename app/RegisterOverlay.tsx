@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, TouchableWithoutFeedback, Modal } from "react-native";
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { router } from "expo-router";
+import SlipButton from "../components/ui/SlipButton";
 
 interface Props {
   visible: boolean;
@@ -36,6 +36,11 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               text="COMMUTER"
               color="#19D226"
               icon={<FontAwesome6 name="user" size={18} color="black" />}
+              widthClassName="w-[260px]"
+              buttonClassName="py-4 rounded-sm border-2 border-black flex-row justify-center items-center"
+              shadowClassName="absolute bg-black rounded-sm"
+              shadowStyle={{ opacity: 0.1 }}
+              textClassName="font-bold text-black"
               onPress={() => {
                 onClose();
                 router.push("./confirm_registration");
@@ -48,6 +53,11 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               text="REGISTER AS DRIVER"
               color="#FF8C00"
               icon={<FontAwesome6 name="motorcycle" size={18} color="black" />}
+              widthClassName="w-[260px]"
+              buttonClassName="py-4 rounded-sm border-2 border-black flex-row justify-center items-center"
+              shadowClassName="absolute bg-black rounded-sm"
+              shadowStyle={{ opacity: 0.1 }}
+              textClassName="font-bold text-black"
               onPress={() => {
                 onClose();
                 router.push("./Driver/registration");
@@ -57,55 +67,5 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
         </View>
       </View>
     </Modal>
-  );
-}
-
-function SlipButton({
-  text,
-  icon,
-  color,
-  onPress,
-}: {
-  text: string;
-  icon?: React.ReactNode;
-  color: string;
-  onPress?: () => void;
-}) {
-  const [pressed, setPressed] = useState(false);
-
-  return (
-    <TouchableWithoutFeedback
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-      onPress={onPress}
-    >
-      <View className="items-center mb-4">
-        <View className="relative w-[260px]">
-          {!pressed && (
-            <View
-              className="absolute bg-black rounded-sm"
-              style={{
-                width: "100%",
-                height: "100%",
-                top: 4,
-                left: 4,
-                opacity: 0.1,
-              }}
-            />
-          )}
-
-          <View
-            className="py-4 rounded-sm border-2 border-black flex-row justify-center items-center"
-            style={{
-              backgroundColor: color,
-              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
-            }}
-          >
-            {icon && <View className="mr-2">{icon}</View>}
-            <Text className="font-bold text-black">{text}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
   );
 }

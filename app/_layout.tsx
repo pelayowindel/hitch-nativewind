@@ -12,7 +12,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: 'index',
+  initialRouteName: 'LogIn',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -27,6 +27,7 @@ export default function RootLayout() {
   return (
     <SupabaseProvider>
       <Stack>
+        <Stack.Screen name="LogIn" options={{ headerShown: false }} />
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="user_registration" options={{ headerShown: false }} />
         <Stack.Screen name="driver_registration" options={{ headerShown: false }} />

@@ -11,79 +11,9 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useFonts } from "expo-font";
-
-/* =============================
-   SLIP CARD
-============================= */
-function SlipCard({
-  children,
-  styleClass = "",
-}: {
-  children: React.ReactNode;
-  styleClass?: string;
-}) {
-  return (
-    <View className={`relative ${styleClass}`}>
-      <View
-        className="absolute bg-black rounded-md"
-        style={{ width: "100%", height: "100%", top: 4, left: 4 }}
-      />
-      <View className="bg-white border-[3px] border-black rounded-md p-3">
-        {children}
-      </View>
-    </View>
-  );
-}
-
-/* =============================
-   SLIP BUTTON
-============================= */
-function SlipButton({
-  text,
-  color,
-  onPress,
-}: {
-  text: string;
-  color: string;
-  onPress?: () => void;
-}) {
-  const [pressed, setPressed] = useState(false);
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={onPress}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-    >
-      <View className="items-center mb-4">
-        <View className="relative w-full">
-          {!pressed && (
-            <View
-              className="absolute bg-black rounded-md"
-              style={{ width: "100%", height: "100%", top: 4, left: 4 }}
-            />
-          )}
-          <View
-            className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
-            style={{
-              backgroundColor: color,
-              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
-            }}
-          >
-            <Text
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-              className="text-black text-lg"
-            >
-              {text}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
+import SlipCard from "../components/ui/SlipCard";
+import SlipButton from "../components/ui/SlipButton";
+import useAppFonts from "../hooks/useAppFonts";
 
 /* =============================
    USER REGISTRATION
@@ -98,11 +28,7 @@ export default function UserRegistration() {
   const genders = ["MALE", "FEMALE"];
 
   // ===== Load Custom Fonts =====
-  const [fontsLoaded] = useFonts({
-    "PlusJakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "PlusJakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "PlusJakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
-  });
+  const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) {
     return null; // Optionally, add a loading indicator
@@ -171,7 +97,7 @@ export default function UserRegistration() {
                 <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
                   FIRST NAME
                 </Text>
-                <SlipCard>
+                <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                   <TextInput
                     placeholder="Juan"
                     style={{ fontFamily: "PlusJakarta-Regular" }}
@@ -183,7 +109,7 @@ export default function UserRegistration() {
                 <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
                   LAST NAME
                 </Text>
-                <SlipCard>
+                <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                   <TextInput
                     placeholder="Dela Cruz"
                     style={{ fontFamily: "PlusJakarta-Regular" }}
@@ -197,7 +123,7 @@ export default function UserRegistration() {
               <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
                 GENDER
               </Text>
-              <SlipCard>
+              <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                 <View>
                   <Pressable
                     onPress={() => setDropdownOpen(!dropdownOpen)}
@@ -236,7 +162,7 @@ export default function UserRegistration() {
               <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
                 ADDRESS
               </Text>
-              <SlipCard>
+              <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                 <TextInput
                   placeholder="Random Place - Bogo City, Cebu"
                   style={{ fontFamily: "PlusJakarta-Regular" }}
@@ -249,7 +175,7 @@ export default function UserRegistration() {
               <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
                 DATE OF BIRTH
               </Text>
-              <SlipCard>
+              <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                 <TextInput
                   placeholder="01/27/2000"
                   style={{ fontFamily: "PlusJakarta-Regular" }}
@@ -270,7 +196,7 @@ export default function UserRegistration() {
               </Text>
               <View className="flex-row gap-3">
                 <View className="w-24">
-                  <SlipCard>
+                  <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                     <TextInput
                       value="+63"
                       editable={false}
@@ -280,7 +206,7 @@ export default function UserRegistration() {
                 </View>
 
                 <View className="flex-1">
-                  <SlipCard>
+                  <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                     <TextInput
                       placeholder="123 456 7834"
                       keyboardType="number-pad"
@@ -297,7 +223,7 @@ export default function UserRegistration() {
               <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-1">
                 EMAIL ADDRESS
               </Text>
-              <SlipCard>
+              <SlipCard contentClassName="p-3" contentStyle={{ borderWidth: 3 }}>
                 <TextInput
                   placeholder="juan06@gmail.com"
                   style={{ fontFamily: "PlusJakarta-Regular" }}
@@ -306,7 +232,12 @@ export default function UserRegistration() {
             </View>
 
             {/* REGISTER BUTTON */}
-            <SlipButton text="REGISTER" color="#00FF38" onPress={handleRegister} />
+            <SlipButton
+              text="REGISTER"
+              color="#00FF38"
+              onPress={handleRegister}
+              textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+            />
           </View>
         </View>
       </ScrollView>
