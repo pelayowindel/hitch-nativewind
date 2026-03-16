@@ -5,88 +5,21 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
-  TouchableWithoutFeedback,
   Modal,
   Animated,
   Easing,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useFonts } from "expo-font";
+import { supabase } from "../lib/supabase";
+import SlipCard from "../components/ui/SlipCard";
+import SlipButton from "../components/ui/SlipButton";
+import useAppFonts from "../hooks/useAppFonts";
 
-/* =============================
-   SLIP CARD (Drop Shadow Wrapper)
-============================= */
-function SlipCard({
-  children,
-  styleClass = "",
-}: {
-  children: React.ReactNode;
-  styleClass?: string;
-}) {
-  return (
-    <View className={`relative ${styleClass}`}>
-      <View
-        className="absolute bg-black rounded-md"
-        style={{ width: "100%", height: "100%", top: 4, left: 4 }}
-      />
-      <View className="bg-white border-2 border-black rounded-md">{children}</View>
-    </View>
-  );
-}
-
-/* =============================
-   SLIP BUTTON
-============================= */
-function SlipButton({
-  text,
-  icon,
-  color,
-  onPress,
-}: {
-  text: string;
-  icon?: React.ReactNode;
-  color: string;
-  onPress?: () => void;
-}) {
-  const [pressed, setPressed] = useState(false);
-
-  return (
-    <TouchableWithoutFeedback
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-      onPress={onPress}
-    >
-      <View className="items-center mb-4">
-        <View className="relative w-full">
-          {!pressed && (
-            <View
-              className="absolute bg-black rounded-md"
-              style={{ width: "100%", height: "100%", top: 4, left: 4 }}
-            />
-          )}
-          <View
-            className="py-4 rounded-md border-2 border-black flex-row justify-center items-center"
-            style={{
-              backgroundColor: color,
-              transform: pressed ? [{ translateX: 2 }, { translateY: 2 }] : [],
-            }}
-          >
-            {icon && <View className="mr-2">{icon}</View>}
-            <Text
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-              className="text-black text-lg"
-            >
-              {text}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
-  );
-}
+const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
 
 const RegistrationScreen: React.FC = () => {
   const router = useRouter();
@@ -96,30 +29,23 @@ const RegistrationScreen: React.FC = () => {
   ============================= */
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
-  const [email, setEmail] = useState<string>("demo@gmail.com");
-  const [password, setPassword] = useState<string>("123");
-  const [confirmPassword, setConfirmPassword] = useState<string>("123");
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [verificationCode, setVerificationCode] = useState<string>("");
+  const [registering, setRegistering] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  // Removed modalVisible and verificationCode state (verification modal is unused)
+  const [retryAt, setRetryAt] = useState<number | null>(null);
 
   /* =============================
      LOAD FONTS
   ============================= */
-  const [fontsLoaded] = useFonts({
-    "PlusJakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "PlusJakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "PlusJakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
-  });
-
-  if (!fontsLoaded) {
-    return null; // Optional: Add loading indicator
-  }
+  const fontsLoaded = useAppFonts();
 
   /* =============================
      ANIMATIONS
   ============================= */
   const loadingFloatAnim = useRef(new Animated.Value(0)).current;
-  const modalFloatAnim = useRef(new Animated.Value(0)).current;
+  // Removed modalFloatAnim (verification modal is unused)
 
   const startFloating = (anim: Animated.Value, amplitude = 20, duration = 800) => {
     Animated.loop(
@@ -150,38 +76,74 @@ const RegistrationScreen: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Removed modal animation effect (verification modal is unused)
+
   useEffect(() => {
-    if (verifying) {
-      startFloating(modalFloatAnim, 15, 600);
-    } else {
-      modalFloatAnim.setValue(0);
-    }
-  }, [verifying]);
+    if (!retryAt) return;
+
+    const timeoutMs = Math.max(0, retryAt - Date.now());
+    const timer = setTimeout(() => setRetryAt(null), timeoutMs);
+
+    return () => clearTimeout(timer);
+  }, [retryAt]);
+
+  if (!fontsLoaded) {
+    return null; // Optional: Add loading indicator
+  }
 
   /* =============================
      HANDLERS
   ============================= */
-  const handleRegister = () => {
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
+  const handleRegister = async () => {
+    const isCoolingDown = !!retryAt && retryAt > Date.now();
+
+    if (isCoolingDown) {
+      const secondsLeft = Math.ceil((retryAt - Date.now()) / 1000);
+      Alert.alert("Too many attempts", `Please wait ${secondsLeft}s before trying again.`);
       return;
     }
-    setModalVisible(true);
-  };
 
-  const handleVerify = () => {
-    setVerifying(true);
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+      Alert.alert("Missing fields", "Email, password, and confirm password are required");
+      return;
+    }
 
-    setTimeout(() => {
-      setVerifying(false);
+    if (password !== confirmPassword) {
+      Alert.alert("Password mismatch", "Passwords do not match");
+      return;
+    }
 
-      if (verificationCode === "123456") {
-        setModalVisible(false);
-        router.push("./user_registration");
-      } else {
-        alert("Invalid verification code");
+    try {
+      setRegistering(true);
+
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        const isRateLimited =
+          error.status === 429 ||
+          error.code === "over_email_send_rate_limit" ||
+          error.message?.toLowerCase().includes("rate limit");
+
+        if (isRateLimited) {
+          setRetryAt(Date.now() + SIGNUP_RETRY_COOLDOWN_MS);
+          Alert.alert("Email send limit reached", "Please wait about 60 seconds, then try again.");
+          return;
+        }
+
+        Alert.alert("Registration failed", error.message);
+        return;
       }
-    }, 1500);
+
+      Alert.alert("Registration successful", "Please log in.");
+      router.replace("/LogIn");
+    } catch (_err) {
+      Alert.alert("Unable to register", "Unable to register right now. Please try again.");
+    } finally {
+      setRegistering(false);
+    }
   };
 
   /* =============================
@@ -242,7 +204,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
         EMAIL ADDRESS
       </Text>
-      <SlipCard styleClass="mb-6">
+      <SlipCard containerClassName="mb-6">
         <TextInput
           value={email}
           onChangeText={setEmail}
@@ -256,7 +218,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
         PASSWORD
       </Text>
-      <SlipCard styleClass="mb-6">
+      <SlipCard containerClassName="mb-6">
         <TextInput
           value={password}
           onChangeText={setPassword}
@@ -270,7 +232,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={{ fontFamily: "PlusJakarta-Medium" }} className="mb-2 text-xs">
         CONFIRM PASSWORD
       </Text>
-      <SlipCard styleClass="mb-12">
+      <SlipCard containerClassName="mb-12">
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -280,53 +242,21 @@ const RegistrationScreen: React.FC = () => {
         />
       </SlipCard>
 
-      <SlipButton text="CONTINUE" color="#00FF38" onPress={handleRegister} />
+      <SlipButton
+        text={
+          registering
+            ? "CREATING ACCOUNT..."
+            : retryAt && retryAt > Date.now()
+            ? "PLEASE WAIT"
+            : "CONTINUE"
+        }
+        color="#00FF38"
+        textStyle={{ fontFamily: "PlusJakarta-Bold" }}
+        disabled={registering || (retryAt !== null && retryAt > Date.now())}
+        onPress={registering || (retryAt !== null && retryAt > Date.now()) ? undefined : handleRegister}
+      />
 
-      {/* Verification Modal */}
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View className="flex-1 bg-black/50 justify-center items-center px-6">
-          <View className="bg-white border-2 border-black rounded-md p-6 w-full relative">
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}
-            >
-              <Ionicons name="close" size={24} color="black" />
-            </TouchableOpacity>
-
-            <Text
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-              className="text-center mb-4 text-lg"
-            >
-              ENTER VERIFICATION CODE
-            </Text>
-
-            <TextInput
-              value={verificationCode}
-              onChangeText={setVerificationCode}
-              placeholder="Enter 6-digit code"
-              keyboardType="numeric"
-              className="border-2 border-black rounded-md px-4 py-3 mb-6"
-              style={{ fontFamily: "PlusJakarta-Regular" }}
-            />
-
-            {verifying ? (
-              <View className="flex-row justify-center items-center">
-                <Animated.View style={{ transform: [{ translateY: modalFloatAnim }] }}>
-                  <MaterialCommunityIcons name="motorbike" size={48} color="#000000" />
-                </Animated.View>
-                <Text
-                  style={{ fontFamily: "PlusJakarta-Bold" }}
-                  className="ml-4 text-black"
-                >
-                  Verifying...
-                </Text>
-              </View>
-            ) : (
-              <SlipButton text="VERIFY" color="#00FF38" onPress={handleVerify} />
-            )}
-          </View>
-        </View>
-      </Modal>
+      {/* Verification Modal removed: modal was unreachable and unused */}
     </SafeAreaView>
   );
 };
