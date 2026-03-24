@@ -43,7 +43,7 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               textClassName="font-bold text-black"
               onPress={() => {
                 onClose();
-                router.push("/confirm_registration");
+                router.push("./confirm_registration");
               }}
             />
 
