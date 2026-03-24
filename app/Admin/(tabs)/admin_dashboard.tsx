@@ -193,7 +193,7 @@ const PendingCard = ({ router }: PendingCardProps) => (
           title="Review"
           icon={<Feather name="eye" size={16} color="black" />}
           styleClass="flex-1"
-          onPress={() => router.push("/Admin/applicants")}
+          onPress={() => router.push("/Admin/admin_verification")}
         />
 
         <CommandButton
