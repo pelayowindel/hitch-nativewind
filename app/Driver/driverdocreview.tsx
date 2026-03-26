@@ -1,18 +1,99 @@
-import { View, Text, Pressable, ScrollView, Animated } from "react-native";
+import { View, Text, Pressable, ScrollView, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useState, useRef } from "react";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import FloatingLoading from "../../constants/floatingloading";
 import useAppFonts from "../../hooks/useAppFonts";
+import { supabase } from "../../lib/supabase";
+import { useSupabase } from "../../contexts/SupabaseContext";
 
 
 export default function ReviewInfo() {
     const fontsLoaded = useAppFonts();
     const [loading, setLoading] = useState<boolean>(false);
-
+    const [driverInfo, setDriverInfo] = useState<any>(null);
+    const [vehicleInfo, setVehicleInfo] = useState<any>(null);
 
     const router = useRouter();
+    const { user } = useSupabase();
+    const {
+        driver_id,
+        frontImage,
+        backImage,
+        orImage,
+        crImage,
+        nbiImage,
+        licenseNumber,
+        firstName,
+        lastName,
+        gender,
+        birthDate,
+        contactNumber,
+        email,
+        address,
+        motorcycleType,
+        brand,
+        model,
+        plateNumber,
+        yearModel,
+        vehicleColor,
+    } = useLocalSearchParams();
+
+    const infoFromParams = {
+        first_name: firstName ?? "",
+        last_name: lastName ?? "",
+        gender: gender ?? "",
+        birth_date: birthDate ?? "",
+        phone: contactNumber ?? "",
+        email: email ?? "",
+        address: address ?? "",
+    };
+
+    const vehicleFromParams = {
+        type: motorcycleType ?? "",
+        brand: brand ?? "",
+        model: model ?? "",
+        plate_number: plateNumber ?? "",
+        year_model: yearModel ?? "",
+        color: vehicleColor ?? "",
+    };
+
+
+    const frontImageUri = frontImage ? String(frontImage) : null;
+    const backImageUri = backImage ? String(backImage) : null;
+    const orImageUri = orImage ? String(orImage) : null;
+    const crImageUri = crImage ? String(crImage) : null;
+    const nbiImageUri = nbiImage ? String(nbiImage) : null;
+    const driverLicenseNumber = licenseNumber ? String(licenseNumber) : "";
+
+    useEffect(() => {
+        const loadData = async () => {
+            const driverId = typeof driver_id === "string" ? driver_id : null;
+            if (!driverId) return;
+
+            const { data: driverData, error: driverError } = await supabase
+                .from("drivers")
+                .select("first_name,last_name,gender,address,birth_date,phone,email")
+                .eq("id", driverId)
+                .single();
+
+            console.log("Review load driver", { driverId, driverData, driverError });
+            if (!driverError) setDriverInfo(driverData);
+
+            const { data: vehicleData, error: vehicleError } = await supabase
+                .from("vehicles")
+                .select("type,brand,model,plate_number,year_model,color")
+                .eq("driver_id", driverId)
+                .single();
+
+            console.log("Review load vehicle", { driverId, vehicleData, vehicleError });
+            if (!vehicleError) setVehicleInfo(vehicleData);
+        };
+
+        loadData();
+    }, [driver_id, user]);
+
     if (!fontsLoaded) return null;
 
 
@@ -85,12 +166,12 @@ export default function ReviewInfo() {
                         }}
                     >
                         {[
-                            [["Name", "Juan"], ["Last Name", "Dela Cruz"], ["Gender", "M"]],
-                            [["Date of Birth", "02/04/1999"], ["Contact Number", "09123456789"]],
-                            [["Email", "juan06@email.com"], ["Address", "Random Place - Bogo City, Cebu"]],
-                            [["Motorcycle Type", "Standard"], ["Brand", "Kawasaki"], ["Model", "K155"]],
-                            [["Plate Number", "G4S1A"], ["Year Model", "2008"]],
-                            [["Vehicle Color", "Green"], ["License Number", "064-152-234"]],
+                            [["First Name", driverInfo?.first_name || infoFromParams.first_name || "-"], ["Last Name", driverInfo?.last_name || infoFromParams.last_name || "-"], ["Gender", driverInfo?.gender || infoFromParams.gender || "-"]],
+                            [["Date of Birth", driverInfo?.birth_date || infoFromParams.birth_date || "-"], ["Contact Number", driverInfo?.phone || infoFromParams.phone || "-"]],
+                            [["Email", driverInfo?.email || infoFromParams.email || "-"], ["Address", driverInfo?.address || infoFromParams.address || "-"]],
+                            [["Motorcycle Type", vehicleInfo?.type || vehicleFromParams.type || "-"], ["Brand", vehicleInfo?.brand || vehicleFromParams.brand || "-"], ["Model", vehicleInfo?.model || vehicleFromParams.model || "-"]],
+                            [["Plate Number", vehicleInfo?.plate_number || vehicleFromParams.plate_number || "-"], ["Year Model", vehicleInfo?.year_model || vehicleFromParams.year_model || "-"]],
+                            [["Vehicle Color", vehicleInfo?.color || vehicleFromParams.color || "-"], ["License Number", driverLicenseNumber || "-"]],
                         ].map((row, i) => (
                             <View key={i} className="flex-row">
                                 {row.map((cell, j) => (
@@ -119,12 +200,20 @@ export default function ReviewInfo() {
                     <View className="flex-row gap-3">
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
                             <Text className="font-bold mb-1">FRONT SIDE</Text>
-                            <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            {frontImageUri ? (
+                                <Image source={{ uri: frontImageUri }} className="w-full h-full rounded" />
+                            ) : (
+                                <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            )}
                         </View>
 
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
                             <Text className="font-bold mb-1">BACK SIDE</Text>
-                            <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            {backImageUri ? (
+                                <Image source={{ uri: backImageUri }} className="w-full h-full rounded" />
+                            ) : (
+                                <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            )}
                         </View>
                     </View>
                 </View>
@@ -137,11 +226,19 @@ export default function ReviewInfo() {
                     <View className="flex-row gap-3">
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
                             <Text className="font-bold">OR</Text>
-                            <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            {orImageUri ? (
+                                <Image source={{ uri: orImageUri }} className="w-full h-full rounded" />
+                            ) : (
+                                <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            )}
                         </View>
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
                             <Text className="font-bold">CR</Text>
-                            <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            {crImageUri ? (
+                                <Image source={{ uri: crImageUri }} className="w-full h-full rounded" />
+                            ) : (
+                                <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                            )}
                         </View>
                     </View>
                 </View>
@@ -152,9 +249,15 @@ export default function ReviewInfo() {
                 </Text>
                 <View className="border-2 border-black rounded-lg p-4 bg-white mb-6">
                     <View className="">
-                        <View className="h-40 border border-dashed border-black rounded-lg items-center justify-center">
-                            <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
-                            <Text className="text-gray-600 mt-2">PNG, JPG, PDF (max 5mb)</Text>
+                        <View className="h-40 border border-dashed border-black rounded-lg items-center justify-center overflow-hidden">
+                            {nbiImageUri ? (
+                                <Image source={{ uri: nbiImageUri }} className="w-full h-full rounded" />
+                            ) : (
+                                <>
+                                    <MaterialCommunityIcons name="image-outline" size={36} color="#666" />
+                                    <Text className="text-gray-600 mt-2">PNG, JPG, PDF (max 5mb)</Text>
+                                </>
+                            )}
                         </View>
                     </View>
                 </View>
