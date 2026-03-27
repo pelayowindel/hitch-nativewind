@@ -310,7 +310,7 @@ export default function documentupload() {
       </ScrollView>
 
       {/* 👇 Outside ScrollView so it covers the full screen */}
-      <FloatingLoading visible={saving} label="SAVING DOCUMENTS..." />
+      <FloatingLoading visible={saving} label="UPLOADING ALL DOCUMENTS..." />
 
     </SafeAreaView>
   );
