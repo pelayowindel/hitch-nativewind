@@ -20,14 +20,65 @@ export default function LoginScreen() {
 
   const fontsLoaded = useAppFonts();
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   const getRouteForRole = (role: AppRole): Href => {
-    if (role === "driver") return "/Driver/driver-dashboard";
     if (role === "admin") return "/Admin";
+    if (role === "driver") return "/Driver/driver-dashboard"; // fallback only
     return "/Rider/rider-dashboard";
+  };
+
+  // 🔥 DRIVER FLOW
+  const handleDriverFlow = async (userId: string) => {
+    try {
+      // 1. Driver Info
+      const { data: driver } = await supabase
+        .from("drivers")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!driver) {
+        router.replace("/Driver/driverregistration");
+        return;
+      }
+
+      // 2. Vehicle Info
+      const { data: vehicle } = await supabase
+        .from("vehicles")
+        .select("*")
+        .eq("driver_id", driver.id)
+        .maybeSingle();
+
+      if (!vehicle) {
+        router.replace("/Driver/vehicleinfo");
+        return;
+      }
+
+      // 3. Documents
+      const { data: docs } = await supabase
+        .from("driver_documents")
+        .select("*")
+        .eq("driver_id", driver.id)
+        .maybeSingle();
+
+      if (!docs) {
+        router.replace("/Driver/driverdocuments");
+        return;
+      }
+
+      // 4. Review
+      if (!driver.is_reviewed) {
+        router.replace("/Driver/driverdocreview");
+        return;
+      }
+
+      // ✅ Done
+      router.replace("/Driver/driver-dashboard");
+
+    } catch (error) {
+      Alert.alert("Error", "Failed to load driver progress.");
+    }
   };
 
   const handleLogin = async () => {
@@ -57,25 +108,24 @@ export default function LoginScreen() {
         return;
       }
 
-      const { data: roleRow, error: roleError } = await supabase
+      // 🔑 Get role
+      const { data: roleRow } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
-        .single();
-
-      if (roleError) {
-        Alert.alert(
-          "Role error",
-          "Logged in, but could not load your role. Continuing as rider."
-        );
-        router.replace(getRouteForRole("rider"));
-        return;
-      }
+        .maybeSingle();
 
       const role = (roleRow?.role ?? "rider") as AppRole;
-      router.replace(getRouteForRole(role));
+
+      // 🔥 ROLE HANDLING
+      if (role === "driver") {
+        await handleDriverFlow(userId);
+      } else {
+        router.replace(getRouteForRole(role));
+      }
+
     } catch (_error) {
-      Alert.alert("Network error", "Could not log in right now. Please try again.");
+      Alert.alert("Network error", "Could not log in right now.");
     } finally {
       setIsLoggingIn(false);
     }
@@ -148,8 +198,7 @@ export default function LoginScreen() {
               Forget Password ?
             </Text>
           </View>
-
-          {/* Buttons */}
+          {/* Login */}
           <SlipButton
             text={isLoggingIn ? "LOGGING IN..." : "LOG IN"}
             color="#FF8C00"
@@ -159,22 +208,18 @@ export default function LoginScreen() {
             shadowClassName="absolute bg-black rounded-2xl"
             shadowStyle={{ top: 3, left: 3 }}
             textClassName="text-black"
-            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
             disabled={isLoggingIn}
             onPress={isLoggingIn ? undefined : handleLogin}
           />
 
+          {/* OR */}
           <View className="flex-row items-center my-6">
             <View className="flex-1 h-[1px] bg-black" />
-            <Text
-              className="mx-3 text-xs text-black"
-              style={{ fontFamily: "PlusJakarta-Medium" }}
-            >
-              OR
-            </Text>
+            <Text className="mx-3 text-xs text-black">OR</Text>
             <View className="flex-1 h-[1px] bg-black" />
           </View>
 
+          {/* Social */}
           <SlipButton
             text="Continue With Google"
             color="#FF8C00"
@@ -183,7 +228,6 @@ export default function LoginScreen() {
             shadowClassName="absolute bg-black rounded-2xl"
             shadowStyle={{ top: 3, left: 3 }}
             textClassName="text-black"
-            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
           />
 
           <SlipButton
@@ -193,20 +237,13 @@ export default function LoginScreen() {
             shadowClassName="absolute bg-black rounded-2xl"
             shadowStyle={{ top: 3, left: 3 }}
             textClassName="text-black"
-            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
           />
 
           {/* Register */}
           <View className="flex-row justify-center mt-6">
+            <Text>Don't Have An Account? </Text>
             <Text
-              className="text-base text-black"
-              style={{ fontFamily: "PlusJakarta-Regular" }}
-            >
-              Don't Have An Account?{" "}
-            </Text>
-            <Text
-              className="text-base text-[#FF8C00]"
-              style={{ fontFamily: "PlusJakarta-Bold" }}
+              className="text-[#FF8C00]"
               onPress={() => setShowRegister(true)}
             >
               Register
@@ -220,7 +257,5 @@ export default function LoginScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-    
   );
 }
-

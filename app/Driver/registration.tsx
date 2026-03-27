@@ -86,7 +86,7 @@ export default function DriverRegistration() {
       // Role is assigned server-side in handle_new_user trigger using requested_role metadata.
 
       Alert.alert("Account created", "Now continue with your driver details.", [
-        { text: "OK", onPress: () => router.push("/Driver/driverregistration") },
+        { text: "OK", onPress: () => router.push("/LogIn") },
       ]);
     } catch (_error) {
       Alert.alert("Network error", "Could not register right now. Please try again.");
