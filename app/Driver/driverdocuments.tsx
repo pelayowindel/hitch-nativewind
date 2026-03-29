@@ -1,8 +1,9 @@
-import { View, Text, TextInput, Pressable, ScrollView, Image } from "react-native";
+import { View, Text, TextInput, Pressable, ScrollView, Image, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import useAppFonts from "../../hooks/useAppFonts";
+import FloatingLoading from "../../constants/uploading";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
@@ -22,6 +23,14 @@ export default function documentupload() {
   const [orImage, setOrImage] = useState<string | null>(null);
   const [crImage, setCrImage] = useState<string | null>(null);
   const [nbiImage, setNbiImage] = useState<string | null>(null);
+
+  const [frontUploading, setFrontUploading] = useState(false);
+  const [backUploading, setBackUploading] = useState(false);
+  const [orUploading, setOrUploading] = useState(false);
+  const [crUploading, setCrUploading] = useState(false);
+  const [nbiUploading, setNbiUploading] = useState(false);
+
+  const [saving, setSaving] = useState(false); // 👈 new
 
   useEffect(() => {
     const loadData = async () => {
@@ -56,6 +65,8 @@ export default function documentupload() {
       return;
     }
 
+    setSaving(true); // 👈 show bar
+
     const payload = {
       driver_id,
       license_number: licenseNumber,
@@ -69,12 +80,14 @@ export default function documentupload() {
     const { data, error } = await supabase.from("driver_documents").insert([payload]);
 
     if (error) {
+      setSaving(false); // 👈 hide bar on error
       console.error("driver_documents insert error", error);
       alert("Unable to save documents. Check your RLS policy and DB schema.");
       return;
     }
 
     console.log("driver_documents saved", data);
+    setSaving(false); // 👈 hide bar on success
     router.push({
       pathname: "./driverdocreview",
       params: {
@@ -85,8 +98,6 @@ export default function documentupload() {
         crImage,
         nbiImage,
         licenseNumber,
-
-        // personal values from driver/vehicle record (fallback if review fetch fails)
         firstName: driverData?.first_name,
         lastName: driverData?.last_name,
         gender: driverData?.gender,
@@ -94,7 +105,6 @@ export default function documentupload() {
         contactNumber: driverData?.phone,
         email: driverData?.email,
         address: driverData?.address,
-
         motorcycleType: vehicleData?.type,
         brand: vehicleData?.brand,
         model: vehicleData?.model,
@@ -105,8 +115,10 @@ export default function documentupload() {
     });
   };
 
-  // 📌 Pick image function
-  const pickImage = async (setImage: any) => {
+  const pickImage = async (
+    setImage: (uri: string) => void,
+    setUploading: (val: boolean) => void
+  ) => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       alert("Permission required!");
@@ -119,7 +131,10 @@ export default function documentupload() {
     });
 
     if (!result.canceled && result.assets?.[0]?.uri) {
+      setUploading(true);
+      await new Promise((res) => setTimeout(res, 1500));
       setImage(result.assets[0].uri);
+      setUploading(false);
     }
   };
 
@@ -131,7 +146,7 @@ export default function documentupload() {
         <View className="mb-6">
           <View className="flex-row items-center mb-2">
             <MaterialCommunityIcons name="card-account-details" size={22} color="#7c3aed" />
-            <Text className="ml-2 font-bold">DRIVER’S LICENSE</Text>
+            <Text className="ml-2 font-bold">DRIVER'S LICENSE</Text>
           </View>
 
           <TextInput
@@ -143,14 +158,19 @@ export default function documentupload() {
           />
 
           <View className="flex-row gap-4">
-
             {/* FRONT */}
             <Pressable
-              onPress={() => pickImage(setFrontImage)}
+              onPress={() => pickImage(setFrontImage, setFrontUploading)}
+              disabled={frontUploading}
               className="flex-1 border border-dashed border-black rounded-lg items-center py-6 bg-white"
             >
-              {frontImage ? (
-                <Image source={{ uri: frontImage }} className="w-full h-32 rounded" />
+              {frontUploading ? (
+                <View className="items-center">
+                  <ActivityIndicator size="large" color="#f97316" />
+                  <Text className="text-xs text-gray-500 mt-2">Uploading...</Text>
+                </View>
+              ) : frontImage ? (
+                <Image source={{ uri: frontImage }} className="w-full h-32 rounded" resizeMode="cover" />
               ) : (
                 <>
                   <View className="w-12 h-12 bg-orange-400 rounded-full items-center justify-center mb-2">
@@ -163,11 +183,17 @@ export default function documentupload() {
 
             {/* BACK */}
             <Pressable
-              onPress={() => pickImage(setBackImage)}
+              onPress={() => pickImage(setBackImage, setBackUploading)}
+              disabled={backUploading}
               className="flex-1 border border-dashed border-black rounded-lg items-center py-6 bg-white"
             >
-              {backImage ? (
-                <Image source={{ uri: backImage }} className="w-full h-32 rounded" />
+              {backUploading ? (
+                <View className="items-center">
+                  <ActivityIndicator size="large" color="#f97316" />
+                  <Text className="text-xs text-gray-500 mt-2">Uploading...</Text>
+                </View>
+              ) : backImage ? (
+                <Image source={{ uri: backImage }} className="w-full h-32 rounded" resizeMode="cover" />
               ) : (
                 <>
                   <View className="w-12 h-12 bg-orange-400 rounded-full items-center justify-center mb-2">
@@ -177,7 +203,6 @@ export default function documentupload() {
                 </>
               )}
             </Pressable>
-
           </View>
         </View>
 
@@ -189,14 +214,19 @@ export default function documentupload() {
           </View>
 
           <View className="flex-row gap-4">
-
             {/* OR */}
             <Pressable
-              onPress={() => pickImage(setOrImage)}
+              onPress={() => pickImage(setOrImage, setOrUploading)}
+              disabled={orUploading}
               className="flex-1 border border-dashed border-black rounded-lg items-center py-6 bg-white"
             >
-              {orImage ? (
-                <Image source={{ uri: orImage }} className="w-full h-32 rounded" />
+              {orUploading ? (
+                <View className="items-center">
+                  <ActivityIndicator size="large" color="#f97316" />
+                  <Text className="text-xs text-gray-500 mt-2">Uploading...</Text>
+                </View>
+              ) : orImage ? (
+                <Image source={{ uri: orImage }} className="w-full h-32 rounded" resizeMode="cover" />
               ) : (
                 <>
                   <View className="w-12 h-12 bg-orange-400 rounded-full items-center justify-center mb-2">
@@ -210,11 +240,17 @@ export default function documentupload() {
 
             {/* CR */}
             <Pressable
-              onPress={() => pickImage(setCrImage)}
+              onPress={() => pickImage(setCrImage, setCrUploading)}
+              disabled={crUploading}
               className="flex-1 border border-dashed border-black rounded-lg items-center py-6 bg-white"
             >
-              {crImage ? (
-                <Image source={{ uri: crImage }} className="w-full h-32 rounded" />
+              {crUploading ? (
+                <View className="items-center">
+                  <ActivityIndicator size="large" color="#f97316" />
+                  <Text className="text-xs text-gray-500 mt-2">Uploading...</Text>
+                </View>
+              ) : crImage ? (
+                <Image source={{ uri: crImage }} className="w-full h-32 rounded" resizeMode="cover" />
               ) : (
                 <>
                   <View className="w-12 h-12 bg-orange-400 rounded-full items-center justify-center mb-2">
@@ -225,7 +261,6 @@ export default function documentupload() {
                 </>
               )}
             </Pressable>
-
           </View>
         </View>
 
@@ -237,11 +272,17 @@ export default function documentupload() {
           </View>
 
           <Pressable
-            onPress={() => pickImage(setNbiImage)}
+            onPress={() => pickImage(setNbiImage, setNbiUploading)}
+            disabled={nbiUploading}
             className="border border-dashed border-black rounded-lg items-center py-6 bg-white"
           >
-            {nbiImage ? (
-              <Image source={{ uri: nbiImage }} className="w-full h-40 rounded" />
+            {nbiUploading ? (
+              <View className="items-center">
+                <ActivityIndicator size="large" color="#f97316" />
+                <Text className="text-xs text-gray-500 mt-2">Uploading...</Text>
+              </View>
+            ) : nbiImage ? (
+              <Image source={{ uri: nbiImage }} className="w-full h-40 rounded" resizeMode="cover" />
             ) : (
               <>
                 <View className="w-12 h-12 bg-orange-400 rounded-full items-center justify-center mb-2">
@@ -255,15 +296,22 @@ export default function documentupload() {
         </View>
 
         {/* Continue */}
+        <View className="relative mt-6 mb-6">
         <Pressable
-          className="bg-orange-500 py-4 rounded items-center border border-black mb-10"
+          className="bg-orange-500 py-4 rounded items-center border border-black"
           style={{ borderWidth: 2 }}
           onPress={handleSaveDocuments}
+          disabled={saving} // 👈 prevent double tap
         >
           <Text className="font-bold text-black">SAVE DOCUMENTS & CONTINUE</Text>
         </Pressable>
+        </View>
 
       </ScrollView>
+
+      {/* 👇 Outside ScrollView so it covers the full screen */}
+      <FloatingLoading visible={saving} label="UPLOADING All DOCUMENTS...." />
+
     </SafeAreaView>
   );
 }
