@@ -12,7 +12,6 @@ export default function DriverPersonalInfoForm() {
 
     const [gender, setGender] = useState("male");
 
-    // ✅ STATES
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [address, setAddress] = useState("");

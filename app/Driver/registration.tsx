@@ -83,9 +83,8 @@ export default function DriverRegistration() {
         return;
       }
 
-      // Role is assigned server-side in handle_new_user trigger using requested_role metadata.
 
-      Alert.alert("Account created", "Now continue with your driver details.", [
+      Alert.alert("Account created", "You can now log in.", [
         { text: "OK", onPress: () => router.push("/LogIn") },
       ]);
     } catch (_error) {

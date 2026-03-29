@@ -30,7 +30,7 @@ export default function documentupload() {
   const [crUploading, setCrUploading] = useState(false);
   const [nbiUploading, setNbiUploading] = useState(false);
 
-  const [saving, setSaving] = useState(false); // 👈 new
+  const [saving, setSaving] = useState(false); 
 
   useEffect(() => {
     const loadData = async () => {
@@ -65,7 +65,7 @@ export default function documentupload() {
       return;
     }
 
-    setSaving(true); // 👈 show bar
+    setSaving(true); 
 
     const payload = {
       driver_id,
@@ -80,14 +80,14 @@ export default function documentupload() {
     const { data, error } = await supabase.from("driver_documents").insert([payload]);
 
     if (error) {
-      setSaving(false); // 👈 hide bar on error
+      setSaving(false); 
       console.error("driver_documents insert error", error);
       alert("Unable to save documents. Check your RLS policy and DB schema.");
       return;
     }
 
     console.log("driver_documents saved", data);
-    setSaving(false); // 👈 hide bar on success
+    setSaving(false); 
     router.push({
       pathname: "./driverdocreview",
       params: {
@@ -301,7 +301,7 @@ export default function documentupload() {
           className="bg-orange-500 py-4 rounded items-center border border-black"
           style={{ borderWidth: 2 }}
           onPress={handleSaveDocuments}
-          disabled={saving} // 👈 prevent double tap
+          disabled={saving} 
         >
           <Text className="font-bold text-black">SAVE DOCUMENTS & CONTINUE</Text>
         </Pressable>
@@ -309,7 +309,7 @@ export default function documentupload() {
 
       </ScrollView>
 
-      {/* 👇 Outside ScrollView so it covers the full screen */}
+      
       <FloatingLoading visible={saving} label="UPLOADING All DOCUMENTS...." />
 
     </SafeAreaView>
