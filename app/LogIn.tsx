@@ -67,11 +67,7 @@ export default function LoginScreen() {
         return;
       }
 
-      // 4. Review
-      if (!driver.is_reviewed) {
-        router.replace("/Driver/driverdocreview");
-        return;
-      }
+      
 
       // ✅ Done
       router.replace("/Driver/driver-dashboard");
