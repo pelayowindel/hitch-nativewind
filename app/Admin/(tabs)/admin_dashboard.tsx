@@ -312,6 +312,7 @@ export default function AdminDashboard() {
           title="User Management"
           subtitle="Manage riders and drivers profile"
           icon={<Feather name="users" size={18} color="black" />}
+          onPress={() => router.push("/Admin/user_management")}
         />
 
         {/* Small Commands */}
