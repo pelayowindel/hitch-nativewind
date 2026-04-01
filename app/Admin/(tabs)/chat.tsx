@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -36,12 +36,27 @@ function SlipBubble({
 }
 
 export default function ChatScreen() {
-  const handleQuickReply = (message: string) => {
-    Alert.alert("Quick Reply", message);
-  };
+  const [messages, setMessages] = useState<
+    { id: number; text: string; sender: "me" | "other" }[]
+  >([]);
+  const [input, setInput] = useState("");
 
   const handleSend = () => {
-    Alert.alert("Send Button", "Message sent!");
+    if (!input.trim()) return;
+
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), text: input.trim(), sender: "me" },
+    ]);
+
+    setInput("");
+  };
+
+  const handleQuickReply = (message: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), text: message, sender: "me" },
+    ]);
   };
 
   return (
@@ -78,44 +93,29 @@ export default function ChatScreen() {
 
       {/* CHAT BODY */}
       <ScrollView className="flex-1 px-4">
-        {/* Timestamp */}
-        <View className="items-center my-2">
-          <Text className="text-gray-600 text-xs bg-gray-200 px-3 py-1 rounded-full">
-            Today 4:20 PM
-          </Text>
-        </View>
-
-        {/* Incoming message */}
-        <View className="my-2 max-w-[75%]">
-          <SlipBubble color="white">
-            <Text>I would like to complain</Text>
-          </SlipBubble>
-          <Text className="text-[10px] text-gray-500 mt-1 ml-1">
-            Juan • 4:21 PM
-          </Text>
-        </View>
-
-        {/* Outgoing message */}
-        <View className="my-2 items-end">
-          <View className="max-w-[75%]">
-            <SlipBubble color="#7ec8ff">
-              <Text className="text-black">what would that be</Text>
-            </SlipBubble>
-            <Text className="text-[10px] text-gray-500 mt-1 text-right">
-              You • 4:21 PM
-            </Text>
+        {messages.map((msg) => (
+          <View
+            key={msg.id}
+            className={`my-2 ${
+              msg.sender === "me" ? "items-end" : "items-start"
+            }`}
+          >
+            <View className="max-w-[75%]">
+              <SlipBubble color={msg.sender === "me" ? "#7ec8ff" : "white"}>
+                <Text className={msg.sender === "me" ? "text-black" : ""}>
+                  {msg.text}
+                </Text>
+              </SlipBubble>
+              <Text
+                className={`text-[10px] text-gray-500 mt-1 ${
+                  msg.sender === "me" ? "text-right" : "ml-1"
+                }`}
+              >
+                {msg.sender === "me" ? "You" : "Juan"} • now
+              </Text>
+            </View>
           </View>
-        </View>
-
-        {/* Another incoming message */}
-        <View className="my-2 max-w-[75%]">
-          <SlipBubble color="white">
-            <Text>i have a problem with this</Text>
-          </SlipBubble>
-          <Text className="text-[10px] text-gray-500 mt-1 ml-1">
-            Juan • 4:23 PM
-          </Text>
-        </View>
+        ))}
       </ScrollView>
 
       {/* QUICK REPLY BUTTONS */}
@@ -147,6 +147,8 @@ export default function ChatScreen() {
         <TextInput
           className="flex-1 bg-white rounded-md px-3 py-2 shadow"
           placeholder="Type a message..."
+          value={input}
+          onChangeText={setInput}
         />
 
         <TouchableOpacity
