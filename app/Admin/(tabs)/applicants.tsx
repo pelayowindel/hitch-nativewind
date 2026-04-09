@@ -96,7 +96,7 @@ export default function ApplicantsScreen() {
             </View>
 
             {/* Arrow Button */}
-            <TouchableOpacity className="p-2" //onPress={() => router.push("/Admin/admin_verification")}
+            <TouchableOpacity className="p-2" onPress={() => router.push("/Admin/admin_verification")}
               >
               <Ionicons name="chevron-forward" size={22} color="blue" />
             </TouchableOpacity>
