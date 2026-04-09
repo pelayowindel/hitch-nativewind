@@ -199,7 +199,6 @@ export default function ReviewInfo() {
                 <View className="border-2 border-black rounded-lg p-4 bg-white mb-6">
                     <View className="flex-row gap-3">
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
-                            <Text className="font-bold mb-1">FRONT SIDE</Text>
                             {frontImageUri ? (
                                 <Image source={{ uri: frontImageUri }} className="w-full h-full rounded" />
                             ) : (
@@ -208,7 +207,6 @@ export default function ReviewInfo() {
                         </View>
 
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
-                            <Text className="font-bold mb-1">BACK SIDE</Text>
                             {backImageUri ? (
                                 <Image source={{ uri: backImageUri }} className="w-full h-full rounded" />
                             ) : (
@@ -225,7 +223,6 @@ export default function ReviewInfo() {
                 <View className="border-2 border-black rounded-lg p-4 bg-white mb-6">
                     <View className="flex-row gap-3">
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
-                            <Text className="font-bold">OR</Text>
                             {orImageUri ? (
                                 <Image source={{ uri: orImageUri }} className="w-full h-full rounded" />
                             ) : (
@@ -233,7 +230,6 @@ export default function ReviewInfo() {
                             )}
                         </View>
                         <View className="flex-1 h-32 border border-dashed border-black rounded-lg items-center justify-center">
-                            <Text className="font-bold">CR</Text>
                             {crImageUri ? (
                                 <Image source={{ uri: crImageUri }} className="w-full h-full rounded" />
                             ) : (
@@ -276,7 +272,7 @@ export default function ReviewInfo() {
 
                             setTimeout(() => {
                                 setLoading(false);
-                                router.push("/LogIn");
+                                router.push("/Driver/driver-dashboard");
                             }, 1500);
                         }}
                     >

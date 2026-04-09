@@ -35,7 +35,6 @@ export default function vehicleinfo() {
 
     if (!fontsLoaded) return null;
 
-    // ✅ SAVE TO SUPABASE
     const handleVehicleSubmit = async () => {
         const { error } = await supabase
             .from("vehicles")

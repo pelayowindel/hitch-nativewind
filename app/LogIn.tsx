@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StatusBar, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AntDesign } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import RegisterOverlay from "./RegisterOverlay";
 import FloatingInput from "../components/ui/FloatingInput";
@@ -19,15 +18,84 @@ export default function LoginScreen() {
   const router = useRouter();
 
   const fontsLoaded = useAppFonts();
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   const getRouteForRole = (role: AppRole): Href => {
-    if (role === "driver") return "/Driver/driver-dashboard";
     if (role === "admin") return "/Admin";
+    if (role === "driver") return "/Driver/driver-dashboard";
     return "/Rider/rider-dashboard";
+  };
+
+  const handleDriverFlow = async (userId: string) => {
+    try {
+
+      const { data: driver } = await supabase
+        .from("drivers")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!driver) {
+        Alert.alert(
+          "Complete Your Profile",
+          "Please complete your driver profile to continue.",
+          [
+            {
+              text: "OK",
+              onPress: () =>
+                router.replace("/Driver/driverregistration"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const { data: vehicle } = await supabase
+        .from("vehicles")
+        .select("*")
+        .eq("driver_id", driver.id)
+        .maybeSingle();
+
+      if (!vehicle) {
+        Alert.alert(
+          "Vehicle Required",
+          "Please add your vehicle information to continue.",
+          [
+            {
+              text: "OK",
+              onPress: () => router.replace("/Driver/vehicleinfo"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const { data: docs } = await supabase
+        .from("driver_documents")
+        .select("*")
+        .eq("driver_id", driver.id)
+        .maybeSingle();
+
+      if (!docs) {
+        Alert.alert(
+          "Documents Required",
+          "Please upload your required documents to continue.",
+          [
+            {
+              text: "OK",
+              onPress: () =>
+                router.replace("/Driver/driverdocuments"),
+            },
+          ]
+        );
+        return;
+      }
+
+      router.replace("/Driver/driver-dashboard");
+
+    } catch (error) {
+      Alert.alert("Error", "Failed to load driver progress.");
+    }
   };
 
   const handleLogin = async () => {
@@ -57,25 +125,22 @@ export default function LoginScreen() {
         return;
       }
 
-      const { data: roleRow, error: roleError } = await supabase
+      const { data: roleRow } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
-        .single();
-
-      if (roleError) {
-        Alert.alert(
-          "Role error",
-          "Logged in, but could not load your role. Continuing as rider."
-        );
-        router.replace(getRouteForRole("rider"));
-        return;
-      }
+        .maybeSingle();
 
       const role = (roleRow?.role ?? "rider") as AppRole;
-      router.replace(getRouteForRole(role));
+
+      if (role === "driver") {
+        await handleDriverFlow(userId);
+      } else {
+        router.replace(getRouteForRole(role));
+      }
+
     } catch (_error) {
-      Alert.alert("Network error", "Could not log in right now. Please try again.");
+      Alert.alert("Network error", "Could not log in right now.");
     } finally {
       setIsLoggingIn(false);
     }
@@ -88,125 +153,52 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 mx-6 my-10 rounded-2xl p-6">
 
-          {/* Title */}
+
           <View className="bg-[#D9D9D9] p-6 mb-8 rounded-xl">
-            <Text
-              className="text-center text-2xl text-black"
-              style={{ fontFamily: "PlusJakarta-Bold" }}
-            >
-              Hop in – Log In to Your Rider Account
+            <Text className="text-center text-2xl text-black">
+              Hop in – Log In to Your Account
             </Text>
           </View>
 
-          {/* Email */}
-          <Text
-            className="text-sm mb-2 text-black"
-            style={{ fontFamily: "PlusJakarta-Medium" }}
-          >
-            Email
-          </Text>
-          <FloatingInput
-            value={email}
-            onChangeText={setEmail}
-            inputStyle={{ fontFamily: "PlusJakarta-Regular" }}
-          />
+          <Text className="text-sm mb-2 text-black">Email</Text>
+          <FloatingInput value={email} onChangeText={setEmail} />
 
-          {/* Password */}
-          <Text
-            className="text-sm mb-2 mt-6 text-black"
-            style={{ fontFamily: "PlusJakarta-Medium" }}
-          >
-            Password
-          </Text>
-          <FloatingInput
-            value={password}
-            onChangeText={setPassword}
-            secure
-            inputStyle={{ fontFamily: "PlusJakarta-Regular" }}
-          />
+          <Text className="text-sm mb-2 mt-6 text-black">Password</Text>
+          <FloatingInput value={password} onChangeText={setPassword} secure />
 
-          {/* Remember */}
           <View className="flex-row justify-between items-center mt-6 mb-8">
             <View className="flex-row items-center">
-              <View
-                className={`w-4 h-4 mr-2 border-2 border-black ${
-                  remember ? "bg-black" : "bg-white"
-                }`}
-              />
-              <Text
-                className="text-xs text-black"
-                style={{ fontFamily: "PlusJakarta-Regular" }}
-              >
-                Remember me
-              </Text>
+              <View className="w-4 h-4 mr-2 border-2 border-black" />
+              <Text className="text-xs text-black">Remember me</Text>
             </View>
 
-            <Text
-              className="text-xs text-black"
-              style={{ fontFamily: "PlusJakarta-Regular" }}
-            >
-              Forget Password ?
+            <Text className="text-xs text-black">
+              Forgot Password?
             </Text>
           </View>
 
-          {/* Buttons */}
           <SlipButton
             text={isLoggingIn ? "LOGGING IN..." : "LOG IN"}
             color="#FF8C00"
             widthClassName="w-[66%]"
             containerClassName="items-center mb-4"
-            buttonClassName="py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
-            shadowClassName="absolute bg-black rounded-2xl"
-            shadowStyle={{ top: 3, left: 3 }}
-            textClassName="text-black"
-            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
             disabled={isLoggingIn}
             onPress={isLoggingIn ? undefined : handleLogin}
           />
 
           <View className="flex-row items-center my-6">
             <View className="flex-1 h-[1px] bg-black" />
-            <Text
-              className="mx-3 text-xs text-black"
-              style={{ fontFamily: "PlusJakarta-Medium" }}
-            >
-              OR
-            </Text>
+            <Text className="mx-3 text-xs text-black">OR</Text>
             <View className="flex-1 h-[1px] bg-black" />
           </View>
 
-          <SlipButton
-            text="Continue With Google"
-            color="#FF8C00"
-            icon={<AntDesign name="google" size={16} color="black" />}
-            buttonClassName="py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
-            shadowClassName="absolute bg-black rounded-2xl"
-            shadowStyle={{ top: 3, left: 3 }}
-            textClassName="text-black"
-            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
-          />
+          <SlipButton text="Continue With Google" color="#FF8C00" />
+          <SlipButton text="Continue With Apple" color="#FF8C00" />
 
-          <SlipButton
-            text="Continue With Apple"
-            color="#FF8C00"
-            buttonClassName="py-3 rounded-2xl border-2 border-black flex-row justify-center items-center"
-            shadowClassName="absolute bg-black rounded-2xl"
-            shadowStyle={{ top: 3, left: 3 }}
-            textClassName="text-black"
-            textStyle={{ fontFamily: "PlusJakarta-Bold" }}
-          />
-
-          {/* Register */}
           <View className="flex-row justify-center mt-6">
+            <Text>Don't Have An Account? </Text>
             <Text
-              className="text-base text-black"
-              style={{ fontFamily: "PlusJakarta-Regular" }}
-            >
-              Don't Have An Account?{" "}
-            </Text>
-            <Text
-              className="text-base text-[#FF8C00]"
-              style={{ fontFamily: "PlusJakarta-Bold" }}
+              className="text-[#FF8C00]"
               onPress={() => setShowRegister(true)}
             >
               Register
@@ -220,7 +212,5 @@ export default function LoginScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-    
   );
 }
-
