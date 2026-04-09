@@ -90,7 +90,7 @@ interface CommandButtonProps {
   icon: React.ReactNode;
   onPress?: () => void;
   styleClass?: string;
-  hideArrow?: boolean;
+  hideArrow?: boolean;  
   centerContent?: boolean;
 }
 
@@ -231,12 +231,12 @@ export default function AdminDashboard() {
             </AppText>
           </View>
 
-          <View className="flex-row space-x-10">
-            <View className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
+           <View className="flex-row gap-x-2">
+            <View className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white mb-3">
               <Feather name="bell" size={20} color="black" />
             </View>
             <View className="w-9 h-9 border border-black rounded-md items-center justify-center bg-white">
-              <Feather name="user" size={20} color="black" />
+              <Feather name="user" size={20} color="black" /> 
             </View>
           </View>
         </View>
