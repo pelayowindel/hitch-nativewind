@@ -12,7 +12,6 @@ export default function DriverPersonalInfoForm() {
 
     const [gender, setGender] = useState("male");
 
-    // ✅ STATES
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [address, setAddress] = useState("");
@@ -82,8 +81,7 @@ export default function DriverPersonalInfoForm() {
                     <Pressable
                         className="w-10 h-10 bg-white rounded border border-black shadow-lg"
                         style={{ borderWidth: 2 }}
-                        onPress={() => router.back()}
-                    >
+                        onPress={() => router.replace('/LogIn')}>
                         <Text className="text-2xl text-center text-black font-bold">←</Text>
                     </Pressable>
                     <Text
