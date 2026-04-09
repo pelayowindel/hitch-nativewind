@@ -272,7 +272,7 @@ export default function ReviewInfo() {
 
                             setTimeout(() => {
                                 setLoading(false);
-                                router.push("/LogIn");
+                                router.push("/Driver/driver-dashboard");
                             }, 1500);
                         }}
                     >

@@ -1,44 +1,39 @@
-import { Tabs } from "expo-router";
-import React from "react";
+import { Stack } from "expo-router";
+import React, { useEffect } from "react";
+import * as SplashScreen from 'expo-splash-screen';
 import RoleGuard from "../../../components/auth/RoleGuard";
+import { SupabaseProvider } from "../../../contexts/SupabaseContext";
 
-export default function DriverTabsLayout() {
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary
+} from 'expo-router';
+
+export const unstable_settings = {
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: 'LogIn',
+};
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
+export default function RootLayout() {
+  useEffect(() => {
+    // Hide splash screen once layout is ready
+    SplashScreen.hideAsync();
+  }, []);
+
   return (
-    <RoleGuard allowedRole="driver">
-      <Tabs
-        screenOptions={{
-          headerShown: false,          // removes "Driver/(tabs)"
-          tabBarStyle: { display: "none" }, // hide default tab bar completely
-        }}
-      >
-        <Tabs.Screen
-          name="driver-dashboard"
-          options={{
-            title: "Home",
-          }}
-        />
-
-        <Tabs.Screen
-          name="history"
-          options={{
-            title: "Activity",
-          }}
-        />
-
-        <Tabs.Screen
-          name="driver-chat"
-          options={{
-            title: "Messages",
-          }}
-        />
-
-        <Tabs.Screen
-          name="driver-profile"
-          options={{
-            title: "Profile",
-          }}
-        />
-      </Tabs>
-    </RoleGuard>
+    <SupabaseProvider>
+      <RoleGuard allowedRole="driver">
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="chat" />
+          <Stack.Screen name="driver-dashboard" />
+          <Stack.Screen name="driver-profile" />
+          <Stack.Screen name="history" />
+          <Stack.Screen name="vehicleinfo" options={{ presentation: 'modal' }} />
+        </Stack>
+      </RoleGuard>
+    </SupabaseProvider>
   );
 }
