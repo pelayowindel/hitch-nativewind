@@ -59,7 +59,7 @@ export default function RegisterOverlay({ visible, onClose }: Props) {
               shadowStyle={{ opacity: 0.1 }}
               textClassName="font-bold text-black"
               onPress={() => {
-                onClose();
+                 onClose();
                 router.push("./Driver/registration");
               }}
             />
