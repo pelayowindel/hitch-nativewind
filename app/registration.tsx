@@ -2,9 +2,9 @@ import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-import FloatingLoading from "../../constants/floatingloading";
-import useAppFonts from "../../hooks/useAppFonts";
-import { supabase } from "../../lib/supabase";
+import FloatingLoading from "../constants/floatingloading";
+import useAppFonts from "../hooks/useAppFonts";
+import { supabase } from "../lib/supabase";
 
 const SIGNUP_RETRY_COOLDOWN_MS = 60_000;
 
