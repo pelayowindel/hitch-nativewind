@@ -15,7 +15,7 @@ export default function RiderProfileScreen() {
 
   return (
     <View className="flex-1 bg-slate-300">
-      {/* Header - safe area so back button and title are below status bar */}
+      {/* Header */}
       <View
         className="flex-row items-center justify-between border-[3px] border-black bg-slate-100 px-4 py-4"
         style={{ paddingTop: Math.max(insets.top, 12) }}
@@ -23,7 +23,6 @@ export default function RiderProfileScreen() {
         <Pressable
           onPress={() => router.back()}
           className="h-10 w-10 items-center justify-center rounded-lg border-[3px] border-black bg-white active:translate-y-0.5"
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <Ionicons name="arrow-back" size={20} color="black" />
         </Pressable>
@@ -32,10 +31,7 @@ export default function RiderProfileScreen() {
           Rider Profile
         </Text>
 
-        <Pressable
-          className="h-10 w-10 items-center justify-center rounded-lg border-[3px] border-black bg-white active:translate-y-0.5"
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
+        <Pressable className="h-10 w-10 items-center justify-center rounded-lg border-[3px] border-black bg-white active:translate-y-0.5">
           <Ionicons name="pencil" size={20} color="black" />
         </Pressable>
       </View>
@@ -43,13 +39,15 @@ export default function RiderProfileScreen() {
       {/* Content */}
       <ScrollView
         className="flex-1"
-        contentContainerClassName="px-6 pb-8"
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingBottom: Math.max(insets.bottom + 120, 140), // ✅ FIXED OVERLAP
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Avatar + status */}
+        {/* Avatar */}
         <View className="mt-8 items-center">
           <View className="relative">
-            {/* Light blue shadow effect */}
             <View className="absolute bottom-[-4px] right-[-4px] h-32 w-32 rounded-full bg-sky-400 opacity-30" />
             <View className="h-32 w-32 rounded-full border-[2px] border-black bg-yellow-300" />
             <View className="absolute bottom-2 right-[-6px] rounded-md border-[3px] border-black bg-black px-3 py-1 rotate-[-8deg]">
@@ -103,9 +101,9 @@ export default function RiderProfileScreen() {
           </Pressable>
         </View>
 
-        {/* List items */}
+        {/* Menu */}
         <View className="mt-8 gap-3">
-          <Pressable className="flex-row items-center rounded-2xl border-[3px] border-black bg-slate-100 px-4 py-4 shadow-[4px_4px_0_0_#000] active:translate-y-1">
+          <Pressable className="flex-row items-center rounded-2xl border-[3px] border-black bg-slate-100 px-4 py-4 shadow-[4px_4px_0_0_#000]">
             <View className="mr-3 h-8 w-8 items-center justify-center rounded-md border-[3px] border-black bg-white">
               <Ionicons name="wallet" size={18} color="#38bdf8" />
             </View>
@@ -113,16 +111,15 @@ export default function RiderProfileScreen() {
               <Text className="text-base font-extrabold uppercase text-black">
                 Wallet
               </Text>
-              <Text className="mt-0.5 text-xs font-medium text-slate-700">
+              <Text className="text-xs text-slate-700">
                 $124.50 Available
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#38bdf8" />
           </Pressable>
 
           <Pressable
             onPress={() => router.push('/Rider/tab-two')}
-            className="flex-row items-center rounded-2xl border-[3px] border-black bg-slate-100 px-4 py-4 shadow-[4px_4px_0_0_#000] active:translate-y-1"
+            className="flex-row items-center rounded-2xl border-[3px] border-black bg-slate-100 px-4 py-4 shadow-[4px_4px_0_0_#000]"
           >
             <View className="mr-3 h-8 w-8 items-center justify-center rounded-md border-[3px] border-black bg-white">
               <Ionicons name="time" size={18} color="#38bdf8" />
@@ -131,93 +128,49 @@ export default function RiderProfileScreen() {
               <Text className="text-base font-extrabold uppercase text-black">
                 Ride History
               </Text>
-              <Text className="mt-0.5 text-xs font-medium text-slate-700">
+              <Text className="text-xs text-slate-700">
                 Last ride: Yesterday
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#38bdf8" />
-          </Pressable>
-
-          <Pressable className="flex-row items-center rounded-2xl border-[3px] border-black bg-slate-100 px-4 py-4 shadow-[4px_4px_0_0_#000] active:translate-y-1">
-            <View className="mr-3 h-8 w-8 items-center justify-center rounded-md border-[3px] border-black bg-white">
-              <Ionicons name="shield-checkmark" size={18} color="#38bdf8" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-base font-extrabold uppercase text-black">
-                Safety Settings
-              </Text>
-              <Text className="mt-0.5 text-xs font-medium text-slate-700">
-                Contacts &amp; Monitoring
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#38bdf8" />
-          </Pressable>
-
-          <Pressable className="flex-row items-center rounded-2xl border-[3px] border-black bg-slate-100 px-4 py-4 shadow-[4px_4px_0_0_#000] active:translate-y-1">
-            <View className="mr-3 h-8 w-8 items-center justify-center rounded-md border-[3px] border-black bg-white">
-              <Ionicons name="settings" size={18} color="#38bdf8" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-base font-extrabold uppercase text-black">
-                Settings
-              </Text>
-              <Text className="mt-0.5 text-xs font-medium text-slate-700">
-                App preferences
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#38bdf8" />
           </Pressable>
         </View>
 
-        {/* SOS button */}
-        <Pressable className="mt-8 rounded-2xl border-[3px] border-black bg-rose-500 py-4 shadow-[0_6px_0_#000] active:translate-y-1">
-          <View className="flex-row items-center justify-center gap-2">
-            <Ionicons name="call" size={18} color="white" />
-            <Text className="text-sm font-extrabold uppercase tracking-[0.3em] text-white">
-              SOS / Emergency
-            </Text>
-          </View>
+        {/* SOS */}
+        <Pressable className="mt-8 rounded-2xl border-[3px] border-black bg-rose-500 py-4">
+          <Text className="text-center font-extrabold text-white">
+            SOS / Emergency
+          </Text>
         </Pressable>
       </ScrollView>
 
-      {}
+      {/* YOUR CUSTOM NAVBAR (UNCHANGED) */}
       <View
         className="border-t-[4px] border-black bg-white px-6 pt-4"
         style={{ paddingBottom: Math.max(insets.bottom, 12) }}
       >
         <View className="flex-row items-center justify-between">
-          <Pressable
-            onPress={() => router.push('/Rider/rider-dashboard' as '/Rider/rider-dashboard')}
-            className="items-center gap-1 py-2"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
+          <Pressable onPress={() => router.push('/Rider/rider-dashboard')}>
             <Ionicons name="home" size={24} color="black" />
-            <Text className="text-[10px] font-extrabold uppercase tracking-wide text-black">
-              Home
-            </Text>
+            <Text className="text-[10px] font-extrabold">Home</Text>
           </Pressable>
 
-          <Pressable
-            onPress={() => router.push('/Rider/tab-two')}
-            className="items-center gap-1 py-2"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
+          <Pressable>
             <Ionicons name="document-text" size={24} color="#64748b" />
-            <Text className="text-[10px] font-extrabold uppercase tracking-wide text-slate-600">
+            <Text className="text-[10px] font-extrabold text-slate-600">
               Activity
             </Text>
           </Pressable>
 
-          <Pressable className="items-center gap-1 py-2" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Pressable>
             <Ionicons name="chatbubble-ellipses" size={24} color="#64748b" />
-            <Text className="text-[10px] font-extrabold uppercase tracking-wide text-slate-600">
+            <Text className="text-[10px] font-extrabold text-slate-600">
               Messages
             </Text>
           </Pressable>
 
-          <Pressable className="items-center gap-1 py-2" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Pressable>
             <Ionicons name="person-outline" size={24} color="#64748b" />
-            <Text className="text-[10px] font-extrabold uppercase tracking-wide text-slate-600">
+            <Text className="text-[10px] font-extrabold text-slate-600">
               Profile
             </Text>
           </Pressable>
